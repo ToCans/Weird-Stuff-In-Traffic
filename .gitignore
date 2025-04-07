@@ -175,3 +175,6 @@ cython_debug/
 
 # Mac related:
 .DS_Store
+
+# AI Related
+*.pt
