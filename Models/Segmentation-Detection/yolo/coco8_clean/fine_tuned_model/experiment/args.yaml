@@ -12,8 +12,8 @@ save_period: -1
 cache: false
 device: cuda
 workers: 4
-project: /home/tom/Desktop/Programming/Shared/Weird-Stuff-In-Traffic/Models/Segmentation-Detection/yolo/training_test_dataset_clean_data/fine_tuned_model
-name: experiment19
+project: /home/tom/Desktop/Programming/Shared/Weird-Stuff-In-Traffic/Models/Segmentation-Detection/yolo/coco8_clean/fine_tuned_model
+name: experiment
 exist_ok: false
 pretrained: true
 optimizer: auto
@@ -103,4 +103,4 @@ erasing: 0.4
 crop_fraction: 1.0
 cfg: null
 tracker: botsort.yaml
-save_dir: /home/tom/Desktop/Programming/Shared/Weird-Stuff-In-Traffic/Models/Segmentation-Detection/yolo/training_test_dataset_clean_data/fine_tuned_model/experiment19
+save_dir: /home/tom/Desktop/Programming/Shared/Weird-Stuff-In-Traffic/Models/Segmentation-Detection/yolo/coco8_clean/fine_tuned_model/experiment
