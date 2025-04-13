@@ -24,4 +24,4 @@ Please change if you see fit :)
     -   `git add .`
     -   `git commit -m "Whatever you want to name this"`
     -   `git push`
--   When your code is ready to be merged into the main branch, open a pull request in the tab above and set someone to review your work (maybe group leaders?)
+-   Merge the changes from your branch into the main branch when you're done.
