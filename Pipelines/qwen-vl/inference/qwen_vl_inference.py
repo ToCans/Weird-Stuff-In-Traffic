@@ -91,7 +91,7 @@ test_image_path = f"Weird-Stuff-In-Traffic/Data/yolo/{training_dataset_name}/ima
 complete_test_image_data_path = path_to_base_directory + test_image_path
 
 # Model Paths
-base_model_name = "Qwen/Qwen2-VL-2B-Instruct-AWQ"
+base_model_name = "Qwen/Qwen2-VL-7B-Instruct"
 
 # %% [markdown]
 # ##### Preparing Processor

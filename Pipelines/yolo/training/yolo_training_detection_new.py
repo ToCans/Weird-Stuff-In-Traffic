@@ -191,16 +191,6 @@ print(f"mAP50-95 (all classes)??: {results.box.map75:.4f}")  # This might be mAP
 #print(f"Precision: {results.box.p:.4f}")
 #print(f"Recall: {results.box.r:.4f}")
 
-# Print class-specific metrics if available
-if hasattr(results, 'names'):
-    print("\nClass-specific metrics:")
-    for i, class_name in results.names.items():
-        print(f"{class_name}:")
-        print(f"  Precision: {results.box.p[i]:.4f}")
-        print(f"  Recall: {results.box.r[i]:.4f}") 
-        #print(f"  mAP50: {results.box.map50[i]:.4f}") # This breaks the code, revisit later
-        #print(f"  mAP50-95: {results.box.map[i]:.4f}") # This breaks the code, revisit later
-
 # %% [markdown]
 # ---
 
