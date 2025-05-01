@@ -1,8 +1,0 @@
-{
-  "prompt_prefix": "a weird object placed on the street, realistic, centered, natural light, ",
-  "negative_prompt": "blurry, lowres, cropped, out of frame, smooth plastic, fake, deformed, extra limbs, watermark, bad quality",
-  "denoising_strength": 0.5,
-  "cfg_scale": 9,
-  "steps": 35,
-  "resize_to": [1600, 900]
-}
