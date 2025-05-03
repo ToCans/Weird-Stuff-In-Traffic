@@ -15,5 +15,9 @@
     "inpaint_full_res": true,
     "inpainting_fill": 1,
     "inpaint_full_res_padding": 64,
-    "mask_blur": 4
+    "mask_blur": 4,
+    "insert_box_width_ratio": 0.15,
+    "insert_box_height_ratio": 0.15,
+    "position_variation_ratio": 0.1,
+    "dim_variation_ratio": 0.05
 }
