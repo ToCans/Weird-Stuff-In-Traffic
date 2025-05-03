@@ -11,7 +11,6 @@ input_dir = 'clean_images'
 mask_dir = 'masks'
 output_weird = 'dataset/weird'
 output_labels = 'dataset/labels'
-resize_target = (640, 640)
 
 os.makedirs(output_weird, exist_ok=True)
 os.makedirs(output_labels, exist_ok=True)
@@ -19,16 +18,13 @@ os.makedirs(output_labels, exist_ok=True)
 with open('gen_config.json', 'r') as f:
     config = json.load(f)
 
-with open('prompts/train_objects.txt', 'r') as f:
+resize_target = tuple(config['resize_target'])
+extra_attributes = config['extra_attributes']
+banned_words = config['banned_words']
+
+# Read the prompt objects from the file specified in the config
+with open(config['prompt_objects_file'], 'r') as f:
     prompt_objects = [line.strip() for line in f if line.strip()]
-
-extra_attributes = [
-    "realistic texture", "photorealistic material", "perfect shadows",
-    "urban fitting style", "complex surface", "high quality material",
-    "integrated into street scene"
-]
-
-banned_words = ["giant", "huge", "massive", "enormous"]
 
 def clean_prompt(prompt):
     for word in banned_words:
@@ -59,17 +55,17 @@ def generate_weird(clean_path, mask_path, output_img, label_path):
         "init_images": [img_to_base64(clean_path)],
         "mask": img_to_base64('temp_mask.png'),
         "prompt": prompt,
-        "negative_prompt": "low quality, blurry, grey blob, bad anatomy, unrecognizable, incomplete object",
-        "denoising_strength": 0.75,
-        "cfg_scale": 10,
-        "steps": 40,
+        "negative_prompt": config['negative_prompt'],
+        "denoising_strength": config['denoising_strength'],
+        "cfg_scale": config['cfg_scale'],
+        "steps": config['steps'],
         "sampler_name": "DPM++ 2M Karras",
         "width": img_width,
         "height": img_height,
-        "inpaint_full_res": True,
-        "inpainting_fill": 1,
-        "inpaint_full_res_padding": 64,
-        "mask_blur": 4
+        "inpaint_full_res": config['inpaint_full_res'],
+        "inpainting_fill": config['inpainting_fill'],
+        "inpaint_full_res_padding": config['inpaint_full_res_padding'],
+        "mask_blur": config['mask_blur']
     }
 
     try:
