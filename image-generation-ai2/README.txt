@@ -34,9 +34,8 @@ Best case if you use an IDE like visual studio code or else; that you make a fol
 
 7. Pipeline
 - fill the clean_images folder with clean images of any size
-- start the auto_mask.py to generate random masks
- - you can adjust things like size and the variation in the file itself
+ - adjust the gen_config.json for parameters you want to change
+- start the auto_mask.py to generate random masks (maybe this script needs to be called within the generate_poc.py before looping over the images?)
 - start the generate_poc.py to generate weird images
- - if you wanna adjust settings of the api you can do it in the payload section (gen_config.json can be deleted eventually but for know I would Keep it; I started to seperate the config from the code and afterwards I started to add everything to the payload but generate_poc is still missing some Arguments from the gen_config.json)
   - the settings Im using are Pretty consistent but if anybody finds other ones which are better let the group know 
    - dont be scared to stop the generation proccess because I implemented a checking loop which checks the names of the weird images and wont start generating a new weird Image on the same clean Image(as Long the weird Image is in the 	dataset folder)
