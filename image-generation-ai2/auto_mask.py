@@ -3,17 +3,22 @@ import cv2
 import numpy as np
 from PIL import Image
 import random
+import json
 
 input_dir = 'clean_images'
 mask_dir = 'masks'
 
 os.makedirs(mask_dir, exist_ok=True)
 
-# Einstellungen
-insert_box_width_ratio = 0.15  # Basis: 20% der Bildbreite
-insert_box_height_ratio = 0.15  # Basis: 20% der Bildhöhe
-position_variation_ratio = 0.1  # max 10% Positionsabweichung
-dim_variation_ratio = 0.05  # max 10% Größenabweichung
+# Load configuration from JSON file
+with open('gen_config.json', 'r') as f:
+    config = json.load(f)
+
+# Settings from config
+insert_box_width_ratio = config['insert_box_width_ratio']
+insert_box_height_ratio = config['insert_box_height_ratio']
+position_variation_ratio = config['position_variation_ratio']
+dim_variation_ratio = config['dim_variation_ratio']
 
 for img_name in os.listdir(input_dir):
     if not img_name.lower().endswith(('.jpg', '.png')):
@@ -23,7 +28,7 @@ for img_name in os.listdir(input_dir):
     img = Image.open(img_path)
     img_width, img_height = img.size
 
-    # Insert Box Size mit Variation
+    # Insert Box Size with Variation
     box_w = int(img_width * insert_box_width_ratio)
     box_h = int(img_height * insert_box_height_ratio)
 
@@ -43,18 +48,18 @@ for img_name in os.listdir(input_dir):
     dx = random.randint(-max_dx, max_dx)
     dy = random.randint(-max_dy, max_dy)
 
-    # Insert Box Position (zentriert mit Variation)
+    # Insert Box Position (centered with variation)
     x1 = int((img_width - box_w) / 2) + dx
     y1 = int((img_height - box_h) / 1.5) + dy
 
-    # Begrenzung innerhalb des Bildes
+    # Ensure within image bounds
     x1 = max(0, min(x1, img_width - box_w))
     y1 = max(0, min(y1, img_height - box_h))
 
     x2 = x1 + box_w
     y2 = y1 + box_h
 
-    # Maske erstellen
+    # Create mask
     mask = np.zeros((img_height, img_width), dtype=np.uint8)
     cv2.rectangle(mask, (x1, y1), (x2, y2), 255, -1)
 
