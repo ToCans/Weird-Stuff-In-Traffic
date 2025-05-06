@@ -92,7 +92,9 @@ weird-traffic-app/
   - **Endpoint:** `POST /api/generate`
   - **Functionality (Simulation):** Regardless of the incoming request, it returns the fixed `placeholder_*.png` images from the `public/` folder in base64 format. It substitutes for a real image generation model. Includes delay simulation.
   - **Functionality (Real - Future):** Expected to take a prompt from the user and generate new images via an AI model (e.g., Stable Diffusion, DALL-E).
+  - **Note:** You should edit the content of `real_route.ts` according to your real API endpoints and then write it into `route.ts`!
 - **`src/app/api/detect/route.ts`**:
   - **Endpoint:** `POST /api/detect`
   - **Functionality (Simulation):** Takes the incoming prompt and base64 image, but instead of using them, returns a random "similarity score" (between 0-100). It substitutes for a real object detection or comparison model. Includes delay simulation.
-  - **Functionality (Real - Future):** Expected to take the user's prompt and image to detect objects within the image or calculate the semantic similarity between the prompt and the image.
+  - **Functionality (Real - Future):** Expected to take the user's prompt and image to detect objects within the image or calculate the semantic similarity between the prompt and the image, and return a `detectedImage`.
+  - **Note:** You should edit the content of `real_route.ts` according to your real API endpoints and then write it into `route.ts`!
