@@ -178,3 +178,6 @@ cython_debug/
 
 # AI Related
 *.pt
+
+# Datast Related
+test_set_chunk3

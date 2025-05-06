@@ -1,0 +1,63 @@
+a whale
+a dolphin
+a porpoise
+a shark
+a seal
+a sea lion
+a walrus
+a manatee
+a dugong
+a narwhal
+a beluga
+a orca
+a manta ray
+a stingray
+a jellyfish
+an octopus
+a squid
+a cuttlefish
+a nautilus
+a lobster
+a crab
+a shrimp
+a prawn
+a krill
+a sea turtle
+a sea snake
+an eel
+a seahorse
+a starfish
+a sea urchin
+a sea cucumber
+a coral
+a sponge
+a clam
+a mussel
+a oyster
+a scallop
+a snail
+a slug
+a nudibranch
+a barnacle
+a horseshoe crab
+a anglerfish
+a lanternfish
+a gulper eel
+a viperfish
+a barracuda
+a tuna
+a swordfish
+a marlin
+a sailfish
+a mackerel
+a cod
+a salmon
+a trout
+a herring
+a sardine
+a anchovy
+a bass
+a catfish
+a pufferfish
+a clownfish
+a lionfish
