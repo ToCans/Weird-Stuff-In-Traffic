@@ -1,0 +1,23 @@
+{
+	"prompt_prefix": "a weird object placed on the street, realistic, natural light",
+	"prompt_objects_file": "prompts/animals_common.txt",
+    "resize_target": [640, 640],
+    "extra_attributes": [
+        "realistic texture", "photorealistic material", "perfect shadows",
+        "urban fitting style", "complex surface", "high quality material",
+        "integrated into street scene"
+    ],
+    "banned_words": ["giant", "huge", "massive", "enormous"],
+    "negative_prompt": "low quality, blurry, grey blob, bad anatomy, unrecognizable, incomplete object",
+    "denoising_strength": 0.75,
+    "cfg_scale": 10,
+    "steps": 40,
+    "inpaint_full_res": true,
+    "inpainting_fill": 1,
+    "inpaint_full_res_padding": 64,
+    "mask_blur": 4,
+    "insert_box_width_ratio": 0.15,
+    "insert_box_height_ratio": 0.15,
+    "position_variation_ratio": 0.1,
+    "dim_variation_ratio": 0.05
+}
