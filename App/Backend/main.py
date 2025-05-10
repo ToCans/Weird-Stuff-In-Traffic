@@ -10,67 +10,56 @@ from fastapi import FastAPI
 
 # AI Related Imports
 from ultralytics import YOLO
-
-# State Machine Import
-from services import states
+import transformers
+import torch
 
 # Schema Imports
-from schemas.images import ImageGenerationPrompt, DetectionRequest, DetectionResponse
+from schemas.images import DetectionRequest, DetectionResponse
 
 # Function Imports
-from services.image_handling import detect, generate
+from services import states
+from services.image_detection import detect
 
 
 # Setting Correct Paths
-# Directory Paths
 current_directory = os.getcwd()
 path_to_base_directory = re.search(rf"(.*?){"Weird-Stuff-In-Traffic"}", current_directory).group(1)
 
 # Model Paths
 best_detection_model_path = "Weird-Stuff-In-Traffic/Models/Segmentation-Detection/yolo/coco8_clean/fine_tuned_model/experiment"
-full_pretrained_model_path = path_to_base_directory + best_detection_model_path + "/weights/best.pt"
+full_detection_model_path = path_to_base_directory + best_detection_model_path + "/weights/best.pt"
 
-# Setting  App
-app = FastAPI()
-
-# Encapsulate models in a dictionary
-MODELS = {
-    "PROMPT_SUMMARY_MODEL": None,
-    "DETECTION_DESCRIPTION_MODEL": None,
-    "GENERATION_MODEL": None,
-    "DETECTION_MODEL": None,
-}
-
-# Necessary lock used for AI actions
-MODEL_LOCK = asyncio.Lock()
-
+# Context Manager
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(_):
+    """App Lifespan."""
     print("Loading models...")
-    await asyncio.sleep(1)
-
     states.MODEL_LOCK = asyncio.Lock()
-    states.GENERATION_MODEL = "GenerationModelLoaded"
-    states.DETECTION_MODEL = YOLO(full_pretrained_model_path)
+    #states.GENERATION_MODEL = "GenerationModelLoaded"
+    states.DETECTION_MODEL = YOLO(full_detection_model_path)
+    states.DETECTION_DESCRIPTION_PROCESSOR = transformers.Qwen2VLProcessor.from_pretrained("Qwen/Qwen2-VL-2B-Instruct")
+    states.DETECTION_DESCRIPTION_MODEL = transformers.Qwen2VLForConditionalGeneration.from_pretrained("Qwen/Qwen2-VL-2B-Instruct", torch_dtype=torch.float16, device_map="auto")
+    states.DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(f"Using {states.DEVICE}.")
     print("Models loaded.")
     yield
-
-    states.GENERATION_MODEL = None
+    states.DETECTION_MODEL = None
+    states.DETECTION_DESCRIPTION_MODEL = None
+    states.DETECTION_DESCRIPTION_PROCESSOR = None
+    states.DEVICE = None
     states.MODEL_LOCK = None
     print("Models shut down.")
 
+# Defining App
 app = FastAPI(lifespan=lifespan)
 
-@app.post("/generate", response_model=dict)
-async def generate_endpoint(req: ImageGenerationPrompt):
-    """Endpoint for generating images from a user prompt."""
-    return await generate(req)
-
+# Routes
 @app.post("/detect", response_model=DetectionResponse)
 async def detect_endpoint(req: DetectionRequest):
     """Endpoint for detecting weird objects in an image."""
     return await detect(req)
 
+# Main Running Area
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
