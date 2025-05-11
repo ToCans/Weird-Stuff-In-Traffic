@@ -1,7 +1,10 @@
-"""services/image_detection.py"""
 # Standard library
 import asyncio
 import base64
+import re
+import os
+import datetime
+import uuid
 
 # Third-party
 import cv2
@@ -17,11 +20,10 @@ from services.image_utils import base64_to_image
 
 async def detect(req: DetectionRequest) -> DetectionResponse:
     """Function used for detecting weird objects."""
-    # Setting Lock if not set
+    # Set lock if not already set
     if states.MODEL_LOCK is None:
         states.MODEL_LOCK = asyncio.Lock()
 
-    # Performing detection
     async with states.MODEL_LOCK:
         # Decode base64 input to NumPy image array
         detect_image = base64_to_image(req.imageBase64)
@@ -29,44 +31,73 @@ async def detect(req: DetectionRequest) -> DetectionResponse:
         # Run YOLO prediction
         print("Running Prediction")
         detection_results = states.DETECTION_MODEL.predict(detect_image)
+        result = detection_results[0]
+        boxes = result.boxes
 
-        # Image formatting
-        annotated_image = np.array(detection_results[0].plot())
-        boxes = detection_results[0].boxes
+        # Check for empty detection
+        if boxes is None or len(boxes) == 0:
+            print("No objects detected. Saving image.")
+
+            # Convert RGB to BGR
+            image_bgr = cv2.cvtColor(detect_image, cv2.COLOR_RGB2BGR)
+
+            # Create a unique filename
+            current_directory = os.getcwd()
+            path_to_base_directory = re.search(rf"(.*?){"Weird-Stuff-In-Traffic"}", current_directory).group(1)
+            filename = f"no_detection_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:8]}.jpeg"
+            save_path = os.path.join(f"{path_to_base_directory}/App/Backend/failed_images", filename)
+
+            # Ensure directory exists
+            os.makedirs(os.path.dirname(save_path), exist_ok=True)
+            cv2.imwrite(save_path, image_bgr)
+
+            return DetectionResponse(
+                prompt=req.prompt,
+                imageBase64=req.imageBase64,
+                score=0.0
+            )
+
+        # Format the annotated image
+        annotated_image = np.array(result.plot())
         img_np = detect_image
+        cropped_image = None
+
+        # Crop the first detected object
         for i, box in enumerate(boxes.xyxy):
-            x1, y1, x2, y2 = map(int, box[:4]) 
+            x1, y1, x2, y2 = map(int, box[:4])
             cropped_image = img_np[y1:y2, x1:x2]
+            break  # Only use the first object for description
 
-        # Convert RGB to BGR before encoding with OpenCV
+        if cropped_image is None:
+            cropped_image = detect_image
+
+        # Convert annotated image to base64
         annotated_image_bgr = cv2.cvtColor(annotated_image, cv2.COLOR_RGB2BGR)
-
-        # Then encode
         success, buffer = cv2.imencode('.jpeg', annotated_image_bgr)
         if not success:
             raise ValueError("Failed to encode image.")
 
-        # Encoded Image
         encoded_image = base64.b64encode(buffer).decode('utf-8')
 
-        # Processing for VLM
+        # Preprocess and generate description
         processed_prompt = preprocess(
             instruction="Please create a list of objects in this image.",
             image_np=cropped_image,
-            processor=states.DETECTION_DESCRIPTION_PROCESSOR)
+            processor=states.DETECTION_DESCRIPTION_PROCESSOR
+        )
 
-        # Summary of detection generated
         print("Running Summary")
-        detection_summary = generate_response(processed_prompt, 
-                                              states.DETECTION_DESCRIPTION_MODEL, 
-                                              states.DETECTION_DESCRIPTION_PROCESSOR, 
-                                              device=states.DEVICE)
+        detection_summary = generate_response(
+            processed_prompt,
+            states.DETECTION_DESCRIPTION_MODEL,
+            states.DETECTION_DESCRIPTION_PROCESSOR,
+            device=states.DEVICE
+        )
 
-        # Build response
         response = DetectionResponse(
             prompt=req.prompt,
             imageBase64=encoded_image,
-            score=float(1/len(detection_summary))
+            score=float(1 / len(detection_summary)) if detection_summary else 0.0
         )
 
         return response

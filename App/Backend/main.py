@@ -37,7 +37,7 @@ async def lifespan(_):
     states.MODEL_LOCK = asyncio.Lock()
     #states.GENERATION_MODEL = "GenerationModelLoaded"
     states.DETECTION_MODEL = YOLO(full_detection_model_path)
-    states.DETECTION_DESCRIPTION_PROCESSOR = transformers.Qwen2VLProcessor.from_pretrained("Qwen/Qwen2-VL-2B-Instruct")
+    states.DETECTION_DESCRIPTION_PROCESSOR = transformers.Qwen2VLProcessor.from_pretrained("Qwen/Qwen2-VL-2B-Instruct", use_fast=True)
     states.DETECTION_DESCRIPTION_MODEL = transformers.Qwen2VLForConditionalGeneration.from_pretrained("Qwen/Qwen2-VL-2B-Instruct", torch_dtype=torch.float16, device_map="auto")
     states.DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using {states.DEVICE}.")

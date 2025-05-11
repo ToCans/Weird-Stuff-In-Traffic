@@ -1,10 +1,17 @@
 """tests/main_test.py"""
 import base64
 import io
+import sys
+import os
 from unittest.mock import patch
 from PIL import Image
-from main import app
 from fastapi.testclient import TestClient
+
+# Add the parent directory (App/Backend) to sys.path to make `main` importable
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+#pylint: disable=wrong-import-position
+from main import app 
 
 def encode_image_to_base64(image_path: str) -> str:
     """Utility Function for encoding image to string"""
