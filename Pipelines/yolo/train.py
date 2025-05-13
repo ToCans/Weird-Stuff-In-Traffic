@@ -12,7 +12,7 @@ else:
     sys.exit("Exiting script: No GPU available. 😢")  
 
 dataset_path = "data.yaml"
-save_dir = "Runs"
+save_dir = "runs"
 
 def train_new():
     model_name = "yolov8n.pt"
