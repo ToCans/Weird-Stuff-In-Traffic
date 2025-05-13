@@ -1,0 +1,6 @@
+train: iteration_1/train/images
+val: iteration_1/val/images
+test: iteration_1/test/images
+
+nc: 1
+names: ['Anomaly'] 
