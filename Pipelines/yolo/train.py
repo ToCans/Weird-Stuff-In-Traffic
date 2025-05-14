@@ -15,7 +15,7 @@ dataset_path = "data.yaml"
 save_dir = "runs"
 
 def train_new():
-    model_name = "yolov8n.pt"
+    model_name = "yolo11n.pt"
     run_name = input("Please enter the run name: ")
     model = YOLO(model_name)
     
@@ -36,7 +36,7 @@ def train_new():
 
 def train_resume():
     while True:
-        run_name = input("Please enter the run name to resume, it can be found in Runs folder: ")
+        run_name = input("Please enter the run name to resume, it can be found in the runs folder: ")
         weights_path = os.path.join(save_dir, run_name, "weights", "last.pt")
 
         if os.path.exists(weights_path):
