@@ -39,3 +39,15 @@ Best case if you use an IDE like visual studio code or else; that you make a fol
 - start the generate_poc.py to generate weird images
   - the settings Im using are Pretty consistent but if anybody finds other ones which are better let the group know 
    - dont be scared to stop the generation proccess because I implemented a checking loop which checks the names of the weird images and wont start generating a new weird Image on the same clean Image(as Long the weird Image is in the 	dataset folder)
+
+Version 2:
+
+1. Overview
+ - Integrated Controlnet for improvement of object placement with edge maps
+ - Updated generate_poc.py; gen_config.json and added canny.py for the function which does the edge Maps
+
+2. Installation
+ - Open WebUI and browse the extension tab for sd-webui-controlnet and install it (Extension -> Available -> Load From … -> sd-webui-controlnet)
+ - Refresh the Extensions under Extension -> Installed and afterward close the WebUI aswell as the cmd
+ - Download the ControlNet Module (https://huggingface.co/webui/ControlNet-modules-safetensors/blob/main/control_canny-fp16.safetensors)
+ - Place it into stable-diffusion-webui/models/ControlNet/

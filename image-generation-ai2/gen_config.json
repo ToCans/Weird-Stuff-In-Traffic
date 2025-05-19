@@ -1,6 +1,6 @@
 {
 	"prompt_prefix": "a weird object placed on the street, realistic, natural light",
-	"prompt_objects_file": "prompts/animals_common.txt",
+	"prompt_objects_file": "prompts\\animals_common.txt",
     "resize_target": [640, 640],
     "extra_attributes": [
         "realistic texture", "photorealistic material", "perfect shadows",
@@ -14,10 +14,32 @@
     "steps": 40,
     "inpaint_full_res": true,
     "inpainting_fill": 1,
-    "inpaint_full_res_padding": 64,
+    "inpaint_full_res_padding": 128,
     "mask_blur": 4,
-    "insert_box_width_ratio": 0.15,
-    "insert_box_height_ratio": 0.15,
+    "insert_box_width_ratio": 0.3,
+    "insert_box_height_ratio": 0.3,
     "position_variation_ratio": 0.1,
-    "dim_variation_ratio": 0.05
+    "dim_variation_ratio": 0.05,
+    "alwayson_scripts": {
+        "controlnet": {
+            "args": [
+            {
+                "image": "<base64-png>",
+                "enable": true,
+                "input_from": "canny", 
+                "module": "canny",
+                "model": "control_canny-fp16 [e3fe7712]",
+                "weight": 1.0,
+                "resize_mode": "Crop and Resize",
+                "low_threshold": 100,
+                "high_threshold": 200,
+                "processor_res": 512,
+                "guidance_start": 0.0,
+                "guidance_end": 1.0,
+                "control_mode": "Balanced",
+                "low_vram": false
+            }
+            ]
+        }
+    }
 }

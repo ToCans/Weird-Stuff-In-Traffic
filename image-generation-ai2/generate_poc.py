@@ -6,6 +6,7 @@ import base64
 import cv2
 from PIL import Image
 import io
+from canny import generate_canny_map
 
 input_dir = 'clean_images'
 mask_dir = 'masks'
@@ -15,7 +16,7 @@ output_labels = 'dataset/labels'
 os.makedirs(output_weird, exist_ok=True)
 os.makedirs(output_labels, exist_ok=True)
 
-with open('gen_config.json', 'r') as f:
+with open('image-generation-ai2\\gen_config.json', 'r') as f:
     config = json.load(f)
 
 resize_target = tuple(config['resize_target'])
@@ -67,9 +68,22 @@ def generate_weird(clean_path, mask_path, output_img, label_path):
         "inpaint_full_res_padding": config['inpaint_full_res_padding'],
         "mask_blur": config['mask_blur']
     }
+    
+    if "alwayson_scripts" in config:
+        payload["alwayson_scripts"] = config["alwayson_scripts"]
+
+    # Sonderfall: input_image generieren (z. B. für ControlNet)
+        for script_name, script in config["alwayson_scripts"].items():
+            for arg in script.get("args", []):
+                if arg.get("enable") and arg.get("input_from") == "canny":
+                    low = arg.get("low_threshold", 100)
+                    high = arg.get("high_threshold", 200)
+                    control_image = generate_canny_map(clean_path, low, high)
+                    arg["image"] = control_image
 
     try:
         r = requests.post("http://127.0.0.1:7860/sdapi/v1/img2img", json=payload)
+        r.raise_for_status()
         result = r.json()['images'][0]
         img_data = base64.b64decode(result)
         img = Image.open(io.BytesIO(img_data))
@@ -90,6 +104,13 @@ def generate_weird(clean_path, mask_path, output_img, label_path):
         with open(label_path, 'w') as f:
             f.write(f"0 {x_center:.6f} {y_center:.6f} {norm_w:.6f} {norm_h:.6f}")
 
+    except requests.exceptions.ConnectionError:
+        print(f"[ERROR] Could not connect to WebUI at http://127.0.0.1:7860 – is it running with --api?")
+    except requests.exceptions.HTTPError as e:
+        print(f"[ERROR] HTTP error from API: {e.response.status_code} {e.response.reason}")
+        print(e.response.text)
+    except KeyError:
+        print(f"[ERROR] API did not return expected image data. Full response:\n{r.text}")
     except Exception as e:
         print(f"[ERROR] Failed on {clean_path}: {e}")
 
