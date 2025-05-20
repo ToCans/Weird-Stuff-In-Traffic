@@ -15,7 +15,8 @@ def objective(trial):
     momentum = trial.suggest_float('momentum', 0.8, 0.98)  # SGD momentum or Adam beta1
     optimizer_name = trial.suggest_categorical('optimizer', ["Adam", 'AdamW', "RMSProp"])  # Optimizer type
     batch_size = trial.suggest_categorical('batch_size', [8, 16, 24, 32])  # Batch size
-
+    cos_lr = trial.suggest_categorical('cos_lr', [True, False])  # Cosine learning rate schedule
+    
     # Regularization parameters
     weight_decay = trial.suggest_float('weight_decay', 0.0001, 0.01)  # Weight decay
     dropout = trial.suggest_categorical('dropout', [0.0, 0.1, 0.2, 0.3, 0.4, 0.5])  # Dropout rate
@@ -51,14 +52,17 @@ def objective(trial):
     results = model.train(
         device=0,
         data=dataset_path,
-        epochs=epochs,  # EDIT BEFORE START
-        patience=patience,  # EDIT BEFORE START
+        epochs=epochs,  
+        patience=patience,  
+        close_mosaic = 0,
 
         batch=batch_size,
         lr0=lr0,
         lrf=lrf,  
         weight_decay=weight_decay,
         optimizer=optimizer_name,  # Must NOT be "auto", else it overrides lr & momentum
+        cos_lr = cos_lr,
+        
         freeze=freeze,
         momentum=momentum,
         dropout=dropout,
