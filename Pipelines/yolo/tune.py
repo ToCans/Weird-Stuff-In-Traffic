@@ -2,10 +2,11 @@ from ultralytics import YOLO
 import optuna
 
 # EDIT BEFORE START
-dataset_path = "data_tune.yaml" #.yaml file path
+dataset_path = "data.yaml" #.yaml file path
 save_dir = "runs"
-epochs = 1
+epochs = 3
 patience = 10
+n_trials = 5
 
 def objective(trial):
 
@@ -43,7 +44,7 @@ def objective(trial):
     fliplr = trial.suggest_float('fliplr', 0.0, 0.5)  # Flip left-right probability
     mosaic = trial.suggest_float('mosaic', 0.0, 1.0)  # Mosaic probability
     mixup = trial.suggest_float('mixup', 0.0, 0.3)  # Mixup probability
-    #cutmix = trial.suggest_float('cutmix', 0.0, 1.0)  # Cutmix probability
+    cutmix = trial.suggest_float('cutmix', 0.0, 1.0)  # Cutmix probability
 
     # Initialize YOLO model
     model = YOLO('yolo11n.pt')  
@@ -88,7 +89,7 @@ def objective(trial):
         fliplr=fliplr,
         mosaic=mosaic,
         mixup=mixup,
-        cutmix=cutmix,
+        #cutmix=cutmix,
     )
     
     # Return the metric to optimize 
@@ -97,11 +98,11 @@ def objective(trial):
 # Create study and optimize
 study = optuna.create_study(
     direction='maximize',    # We want to maximize mAP50-95
-    study_name='yolo_optimization_new1',
+    study_name='yolo_optimization',
     storage='sqlite:///yolo_optuna.db',
     load_if_exists=True,  # continue existing study if found in dir 
 )
-study.optimize(objective, n_trials=3)
+study.optimize(objective, n_trials=n_trials)
 
 # Print best results
 print('Best trial:')
