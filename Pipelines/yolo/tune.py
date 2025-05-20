@@ -43,7 +43,7 @@ def objective(trial):
     fliplr = trial.suggest_float('fliplr', 0.0, 0.5)  # Flip left-right probability
     mosaic = trial.suggest_float('mosaic', 0.0, 1.0)  # Mosaic probability
     mixup = trial.suggest_float('mixup', 0.0, 0.3)  # Mixup probability
-    cutmix = trial.suggest_float('cutmix', 0.0, 1.0)  # Cutmix probability
+    #cutmix = trial.suggest_float('cutmix', 0.0, 1.0)  # Cutmix probability
 
     # Initialize YOLO model
     model = YOLO('yolo11n.pt')  
