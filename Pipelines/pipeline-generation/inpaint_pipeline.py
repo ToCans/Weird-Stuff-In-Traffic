@@ -1,5 +1,6 @@
 from realvisxl import realvisxl_inpaint
 from get_biggest_bbox_inside_polygon import get_suitable_inpaint_area
+from subExtract import extract_nouns_with_counts
 from PIL import Image, ImageDraw
 import time
 from ultralytics import YOLO
@@ -14,7 +15,6 @@ yolo_model_path = "change/to/model/location"
 
 # load yolo model
 street_detection_yolo_model = YOLO(yolo_model_path)
-
 
 def get_image_and_suitable_region(all_street_image_paths, image_cache):
 
@@ -145,6 +145,9 @@ def inpaint_pipeline(prompt_list, num_images_per_prompt, same_image_per_promt=Fa
     # iterate over prompts and do inpainting for every prompt
     for prompt in prompt_list:
 
+        # extract subjects from prompt
+        prompt_subjects = extract_nouns_with_counts(prompt)
+
         # loads one image per prompt
         if same_image_per_promt:
             # get image, polygon and suitable bbox
@@ -189,6 +192,7 @@ def inpaint_pipeline(prompt_list, num_images_per_prompt, same_image_per_promt=Fa
             # save results
             results.append({
                 "prompt": prompt,
+                "prompt subjects": prompt_subjects, 
                 "inpaint_bbox_xyxy": list(inpaint_bbox),
                 "inpainted_image": inpainted_image_base64
             })
