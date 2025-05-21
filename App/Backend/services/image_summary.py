@@ -1,18 +1,19 @@
 """ services/image_summary """
 
+# Imports
 from PIL import Image
 import torch
 import numpy as np
 import transformers
 
-# User Instruction need to be formatted in a way for the model to understand
-def preprocess(instruction: str, image_np: np.ndarray, processor: transformers.AutoProcessor) -> transformers.BatchEncoding:
+def preprocess(instruction: str, image_np: np.ndarray,
+               processor: transformers.AutoProcessor) -> transformers.BatchEncoding:
     """Preprocesses the image and prompt into the correct format for the VLM."""
     # Opening Image
     image = Image.fromarray(image_np)
 
     # System Instructions
-    system_instruction = "You are an assistant that returns the subjects of the image."   
+    system_instruction = "You are an assistant that returns the subjects of the image."
 
     # Formatting the Chat
     chat = [
@@ -39,8 +40,9 @@ def preprocess(instruction: str, image_np: np.ndarray, processor: transformers.A
 
     return model_inputs
 
-# Model Response Generation (max length needs to be adjusted so that the model's response isn't cut off)
-def generate_response(model_inputs, base_model: transformers.Qwen2VLForConditionalGeneration, processor: transformers.AutoProcessor, device:torch.device, max_new_tokens=256):
+def generate_response(model_inputs, base_model: transformers.Qwen2VLForConditionalGeneration,
+                      processor: transformers.AutoProcessor, device:torch.device,
+                      max_new_tokens=256):
     """ Generates the desired text from the given image and prompt."""
     # Preparing device and setting inputs
     base_model.eval()

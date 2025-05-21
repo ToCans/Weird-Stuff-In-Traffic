@@ -1,3 +1,5 @@
+"""services/image_detection.py"""
+
 # Standard library
 import asyncio
 import base64
@@ -7,7 +9,7 @@ import datetime
 import uuid
 
 # Third-party
-import cv2
+import cv2  # Ensure opencv-python is installed: pip install opencv-python
 import numpy as np
 
 # Local application
@@ -21,16 +23,16 @@ from services.image_utils import base64_to_image
 async def detect(req: DetectionRequest) -> DetectionResponse:
     """Function used for detecting weird objects."""
     # Set lock if not already set
-    if states.MODEL_LOCK is None:
-        states.MODEL_LOCK = asyncio.Lock()
+    if states.BACKEND_LOCK is None:
+        states.BACKEND_LOCK = asyncio.Lock()
 
-    async with states.MODEL_LOCK:
+    async with states.BACKEND_LOCK:
         # Decode base64 input to NumPy image array
         detect_image = base64_to_image(req.imageBase64)
 
         # Run YOLO prediction
         print("Running Prediction")
-        detection_results = states.DETECTION_MODEL.predict(detect_image)
+        detection_results = states.WEIRD_DETECTION_MODEL.predict(detect_image)
         result = detection_results[0]
         boxes = result.boxes
 
@@ -54,7 +56,7 @@ async def detect(req: DetectionRequest) -> DetectionResponse:
             return DetectionResponse(
                 prompt=req.prompt,
                 imageBase64=req.imageBase64,
-                score=0.0
+                score=1.0
             )
 
         # Format the annotated image
@@ -86,7 +88,7 @@ async def detect(req: DetectionRequest) -> DetectionResponse:
             processor=states.DETECTION_DESCRIPTION_PROCESSOR
         )
 
-        print("Running Summary")
+        # Generated a Summary
         detection_summary = generate_response(
             processed_prompt,
             states.DETECTION_DESCRIPTION_MODEL,
@@ -94,6 +96,7 @@ async def detect(req: DetectionRequest) -> DetectionResponse:
             device=states.DEVICE
         )
 
+        # Determining Final Scoring
         response = DetectionResponse(
             prompt=req.prompt,
             imageBase64=encoded_image,

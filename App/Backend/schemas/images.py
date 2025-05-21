@@ -7,7 +7,7 @@ from pydantic import BaseModel
 
 class ImageGenerationPrompt(BaseModel):
     """Request body for image generation request."""
-    promtp: str
+    prompt: str
 
 class GeneratedImage(BaseModel):
     """Single image prompted for image generation."""
