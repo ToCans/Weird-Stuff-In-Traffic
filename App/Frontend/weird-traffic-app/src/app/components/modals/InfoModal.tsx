@@ -8,7 +8,7 @@ interface InfoModalProps {
   onClose: () => void;
 }
 
-type TabId = "scoring" | "tips" | "goal" | "about";
+type TabId = "scoring" | "tips" | "goal" | "instructions";
 
 interface Tab {
   id: TabId;
@@ -19,7 +19,7 @@ const tabs: Tab[] = [
   { id: "scoring", label: "Scoring" },
   { id: "tips", label: "Tips" },
   { id: "goal", label: "Our Goal" },
-  { id: "about", label: "About Us" },
+  { id: "instructions", label: "Game Instructions" },
 ];
 
 const scoringData = [
@@ -71,7 +71,7 @@ export const InfoModal: React.FC<InfoModalProps> = ({ isOpen, onClose }) => {
       tabIndex={-1}
     >
       <div
-        className="relative bg-[var(--dark-gray)] text-white rounded-2xl shadow-lg p-10 w-full max-w-[700px] font-mono"
+        className="relative bg-[var(--dark-gray)] text-white rounded-2xl shadow-lg p-10 w-full max-w-[800px] font-mono"
         onClick={handleModalContentClick}
         role="document"
       >
@@ -108,7 +108,7 @@ export const InfoModal: React.FC<InfoModalProps> = ({ isOpen, onClose }) => {
         {/* Content Area */}
         <div className="mt-4">
           {activeTab === "scoring" && (
-            <div>
+            <div className="h-[400px] w-full overflow-y-auto custom-scrollbar">
               <div className="flex justify-between text-sm text-foreground mb-2 px-2">
                 <span>Recognized</span>
                 <span>Points</span>
@@ -129,18 +129,87 @@ export const InfoModal: React.FC<InfoModalProps> = ({ isOpen, onClose }) => {
             </div>
           )}
           {activeTab === "tips" && (
-            <p className="text-sm">Here are some useful tips...</p> // Yer tutucu
+            <div className="h-[400px] w-full overflow-y-auto custom-scrollbar p-2 text-sm text-light">
+              <p>Tips for creating creative and unique prompts.</p>
+            </div>
           )}
           {activeTab === "goal" && (
-            <p className="text-sm">Our goal is to...</p> // Yer tutucu
+            <div className="h-[400px] w-full overflow-y-auto custom-scrollbar p-2 space-y-4 text-sm text-light">
+              <p>
+                The goal of Weird Stuff in Traffic is to generate as many
+                creative and unexpected prompts as possible to train a detection
+                AI for autonomous driving. By challenging the AI with unusual
+                and complex traffic scenarios, we aim to improve its ability to
+                handle real-world situations, making autonomous vehicles safer
+                and more reliable.
+              </p>
+              <p>
+                Every prompt you create helps expose potential blind spots in
+                the AI's understanding of the road, contributing to a smarter
+                and more adaptive driving system. So, get creative and push the
+                boundaries of what the AI can understand!
+              </p>
+            </div>
           )}
-          {activeTab === "about" && (
-            <p className="text-sm">Learn more about us...</p> // Yer tutucu
+          {activeTab === "instructions" && (
+            <div className="h-[400px] w-full overflow-y-auto custom-scrollbar p-2 space-y-6 text-sm text-light">
+              <div className="rounded-2xl p-[2px] bg-weird-gradient">
+                <div className="bg-[var(--gray)] rounded-2xl p-3 space-y-1">
+                  <div className="font-bold">Goal</div>
+                  <div>
+                    Confuse the AI by creating traffic scenarios it struggles to
+                    interpret. Earn points for creative prompts and unlock
+                    upgrades as you progress.
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                <div className="font-bold text-base">How to Play:</div>
+
+                <div className="space-y-2">
+                  <div className="font-bold">1. Enter a Prompt:</div>
+                  <ul className="list-disc pl-6 space-y-2">
+                    <li>
+                      Use the input field to type your own creative ideas.
+                    </li>
+                    <li>
+                      The goal is to challenge the AI with unusual and
+                      unpredictable scenarios.
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="font-bold">2. Get Inspiration:</div>
+                  <ul className="list-disc pl-6 space-y-2">
+                    <li>Slot Machine: Spin for three random words.</li>
+                    <li>
+                      Flying Words: Tap on floating words to build a prompt.
+                    </li>
+                    <li>
+                      Fill in the Blank: Complete sentences for unpredictable
+                      results.
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="font-bold">3. Submit and Score:</div>
+                  <ul className="list-disc pl-6 space-y-2">
+                    <li>Click Submit to see how the AI reacts.</li>
+                    <li>
+                      You earn points based on how effectively your prompt
+                      confuses the AI.
+                    </li>
+                    <li>Use the feedback to improve your strategies.</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
           )}
         </div>
       </div>
     </div>
   );
 };
-
-// Make sure to install lucide-react if you haven't: npm install lucide-react or yarn add lucide-react

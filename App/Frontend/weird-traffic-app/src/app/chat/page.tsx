@@ -14,6 +14,13 @@ import { SlotmachineGame } from "@/app/components/game/SlotMachine";
 import { ClapwordsGame } from "@/app/components/game/ClapwordsGame";
 import { useChatLogic } from "@/app/hooks/useChatLogic";
 import { Modal } from "@/app/components/modals/ShareModal_1";
+import dynamic from "next/dynamic";
+
+// Dynamically import TutorialTour with SSR disabled
+const TutorialTour = dynamic(
+  () => import("@/app/components/game/TutorialTour"),
+  { ssr: false }
+);
 
 export default function ChatPage() {
   const {
@@ -130,17 +137,46 @@ export default function ChatPage() {
         {/* Column 1: Dialog and Car */}
         <div className="w-full md:w-1/3 flex flex-col justify-between p-4 md:p-6 md:ml-10 md:mt-10 order-2 md:order-1">
           {/* Dialog */}
-          <div className="max-w-xs mx-auto md:mx-0 animate-slide-up-fade-in z-10 relative ">
+          <div
+            className="max-w-xs mx-auto md:mx-0 animate-slide-up-fade-in z-10 relative"
+            id="avatar-dialog-container"
+          >
             <Dialog>
-              <TypeAnimation
-                sequence={animationSequence}
-                wrapper="span"
-                speed={60}
-                style={{ whiteSpace: "pre-line", display: "inline-block" }}
-                repeat={0}
-                cursor={true}
-                key={JSON.stringify(dialogSequence)}
-              />
+              {typeof dialogSequence.expanded === "object" &&
+              dialogSequence.expanded.type === "detectionResult" ? (
+                <TypeAnimation
+                  sequence={[
+                    dialogSequence.expanded.baseMessageInitial,
+                    1000,
+                    dialogSequence.expanded.baseMessageExpanded,
+                    () => {
+                      const detectionResult =
+                        dialogSequence.expanded as DetectionResultPayload;
+                      finalizeScoreUpdate(
+                        detectionResult.points,
+                        detectionResult.score,
+                        detectionCount
+                      );
+                    },
+                  ]}
+                  wrapper="span"
+                  speed={60}
+                  style={{ whiteSpace: "pre-line", display: "inline-block" }}
+                  repeat={0}
+                  cursor={true}
+                  key={JSON.stringify(dialogSequence)}
+                />
+              ) : (
+                <TypeAnimation
+                  sequence={animationSequence}
+                  wrapper="span"
+                  speed={60}
+                  style={{ whiteSpace: "pre-line", display: "inline-block" }}
+                  repeat={0}
+                  cursor={true}
+                  key={JSON.stringify(dialogSequence)}
+                />
+              )}
             </Dialog>
           </div>
           {/* Car image */}
@@ -160,10 +196,12 @@ export default function ChatPage() {
           {/* Content Area: Conditionally render Chat or Game */}
           <div
             ref={chatContainerRef}
-            className={`flex-1 md:overflow-y-auto relative z-0 space-y-6 custom-scrollbar p-4 ${
+            className={`flex-1 relative z-0 space-y-6 custom-scrollbar p-4 ${
               activeView !== "chat" || messages.length === 0
                 ? "flex flex-col justify-center items-center"
                 : ""
+            } ${
+              activeView === "chat" ? "md:overflow-y-auto" : "overflow-hidden"
             }`}
             style={{ minHeight: "300px" }}
           >
@@ -270,7 +308,7 @@ export default function ChatPage() {
           </motion.div>
         </div>
       </div>
-
+      <TutorialTour />
       <Modal
         isOpen={isShareModalOpen}
         onClose={handleCloseShareModal}

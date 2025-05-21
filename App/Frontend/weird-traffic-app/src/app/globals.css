@@ -7,6 +7,7 @@
   --gray: #383838;
   --green: #1fbc4e;
   --border: #424242;
+  --text-light: #bababa;
 }
 
 @theme inline {
@@ -29,43 +30,43 @@ body {
   font-family: var(--font-mono);
 }
 
-/* Animasyon Keyframes */
+/* Animation Keyframes */
 @keyframes slide-up-fade-in {
   from {
     opacity: 0;
-    transform: translateY(20px); /* Aşağıdan başla */
+    transform: translateY(20px); /* Start from bottom */
   }
   to {
     opacity: 1;
-    transform: translateY(0); /* Normal pozisyona gel */
+    transform: translateY(0); /* Move to normal position */
   }
 }
 
 @keyframes slide-down-fade-in {
   from {
     opacity: 0;
-    transform: translateY(-20px); /* Yukarıdan başla */
+    transform: translateY(-20px); /* Start from top */
   }
   to {
     opacity: 1;
-    transform: translateY(0); /* Normal pozisyona gel */
+    transform: translateY(0); /* Move to normal position */
   }
 }
 
 @keyframes slide-left-fade-in {
   from {
     opacity: 0;
-    transform: translateX(-200px); /* Soldan başla (-200px) */
+    transform: translateX(-200px); /* Start from left (-200px) */
   }
   to {
     opacity: 1;
-    transform: translateX(0); /* Normal pozisyona gel */
+    transform: translateX(0); /* Move to normal position */
   }
 }
 
-/* Animasyon Utility Sınıfları */
+/* Animation Utility Classes */
 .animate-slide-up-fade-in {
-  animation: slide-up-fade-in 0.5s ease-out forwards; /* 0.5 saniye, yumuşak çıkış, sonda kal */
+  animation: slide-up-fade-in 0.5s ease-out forwards; /* 0.5 seconds, ease-out, stay at end */
 }
 
 .animate-slide-down-fade-in {
@@ -73,10 +74,10 @@ body {
 }
 
 .animate-slide-left-fade-in {
-  animation: slide-left-fade-in 0.8s ease-out forwards; /* 0.8s süre, ease-out easing */
+  animation: slide-left-fade-in 0.8s ease-out forwards; /* 0.8s duration, ease-out easing */
 }
 
-/* İsteğe bağlı: Animasyon gecikmesi için sınıflar */
+/* Optional: Animation delay classes */
 .animation-delay-100 {
   animation-delay: 100ms;
 }
@@ -86,30 +87,36 @@ body {
 .animation-delay-300 {
   animation-delay: 300ms;
 }
-/* ... ihtiyaç duydukça ekleyebilirsiniz ... */
+/* ... add more as needed ... */
 
-/* Gradient Utility Sınıfları */
+/* Gradient Utility Classes */
 .bg-weird-gradient {
   background-image: linear-gradient(to right, #b9e55a, #1fbc4e);
 }
 
 .text-gradient-weird {
   background-image: linear-gradient(to right, #b9e55a, #1fbc4e);
-  -webkit-background-clip: text; /* Webkit tarayıcıları için */
+  -webkit-background-clip: text; /* For Webkit browsers */
   background-clip: text;
-  color: transparent; /* Metnin kendisini şeffaf yap */
+  color: transparent; /* Make text transparent */
 }
 
-/* Global scrollbar stili */
+/* Text color utility class */
+.text-light {
+  color: var(--text-light);
+}
+
+/* Global scrollbar style */
 .custom-scrollbar {
   scrollbar-width: 100px;
   scrollbar-color: #383838 #1f1f1f;
 }
-/* Shimmer Skeleton Efekti */
+
+/* Shimmer Skeleton Effect */
 .skeleton {
   position: relative;
   overflow: hidden;
-  background-color: #2c2c2c; /* veya bg-zinc-800 karşılığı */
+  background-color: #2c2c2c; /* or equivalent to bg-zinc-800 */
   border-radius: 1rem; /* rounded-4xl */
 }
 
