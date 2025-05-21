@@ -31,7 +31,7 @@ path_to_base_directory = re.search(rf"(.*?){"Weird-Stuff-In-Traffic"}", current_
 weird_obj_detection_model_path = "Weird-Stuff-In-Traffic/Models/Segmentation-Detection/yolo/coco8_clean/fine_tuned_model/experiment"
 street_detection_model_path = "Weird-Stuff-In-Traffic/App/Backend/models"
 full_weird_obj_detection_model_path = path_to_base_directory + weird_obj_detection_model_path + "/weights/best.pt"
-full_street_detection_detection_model_path = path_to_base_directory + street_detection_model_path + "streetseg_256_auto.pt"
+full_street_detection_detection_model_path = path_to_base_directory + street_detection_model_path + "/streetseg_256_auto.pt"
 
 # Context Manager
 @asynccontextmanager
@@ -43,7 +43,7 @@ async def lifespan(_):
     states.GENERATION_MODEL = StableDiffusionXLInpaintPipeline.from_pretrained("stabilityai/stable-diffusion-xl-base-1.0",torch_dtype=torch.float16, variant="fp16", safety_checker=None).to(states.DEVICE)
     states.GENERATION_MODEL.scheduler = DPMSolverMultistepScheduler.from_config(states.GENERATION_MODEL.scheduler.config)
     states.WEIRD_DETECTION_MODEL = YOLO(full_weird_obj_detection_model_path).to(states.DEVICE)
-    states.STREET_DETECTION_MODEL = YOLO(full_weird_obj_detection_model_path).to(states.DEVICE)
+    states.STREET_DETECTION_MODEL = YOLO(full_street_detection_detection_model_path).to(states.DEVICE)
     states.DETECTION_DESCRIPTION_PROCESSOR = transformers.Qwen2VLProcessor.from_pretrained("Qwen/Qwen2-VL-2B-Instruct", use_fast=True)
     states.DETECTION_DESCRIPTION_MODEL = transformers.Qwen2VLForConditionalGeneration.from_pretrained("Qwen/Qwen2-VL-2B-Instruct", torch_dtype=torch.float16).to(states.DEVICE)
     print(f"Using {states.DEVICE}.")

@@ -262,7 +262,7 @@ def realvisxl_inpaint(x1, y1, x2, y2, image, user_prompt):
     torch.cuda.empty_cache()
     torch.cuda.ipc_collect()
 
-    result = states.GENERATION_MODEL.inpaint(
+    result = states.GENERATION_MODEL(
         prompt=user_prompt + styling_prompt,
         negative_prompt=negative_prompt,
         image=image,

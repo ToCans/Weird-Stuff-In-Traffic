@@ -31,7 +31,7 @@ async def generate(req: ImageGenerationPrompt) -> GeneratedImages:
             source=street_image,
             task='segment',
             verbose=False,
-            conf=0.10 # Temporarily lowered to get a mask, was 0.25
+            conf=0.25
         )
 
         print(polygons_results)
