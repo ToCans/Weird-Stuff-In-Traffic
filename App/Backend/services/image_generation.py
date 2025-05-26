@@ -3,6 +3,8 @@
 # Standard library
 import asyncio
 from io import BytesIO
+import base64
+import json
 
 # Third-party
 from PIL import Image
@@ -38,21 +40,46 @@ async def generate(req: ImageGenerationPrompt) -> GeneratedImages:
 
         street_image, suitable_inpaint_region_bbox, height_diff = get_suitable_region(polygons_results, street_image)
 
-        # get random fitting bbox for inpainting
-        inpaint_bbox = get_random_bbox_within_bbox(
-                    bbox=suitable_inpaint_region_bbox, 
-                    min_width=street_image.width*0.4, 
-                    max_width=street_image.width*0.7, 
-                    min_height=street_image.height*0.4, 
-                    max_height=street_image.height*0.7,
-                    height_diff=height_diff,
-                    image_size=street_image.size
-            )
+        results = []
 
-        # Inpainting the image
-        print("Attempting Inpainting")
-        inpainted_image = inpaint_image(street_image.copy(), inpaint_bbox, req.prompt)
-        buffered = BytesIO()
-        inpainted_image.save(buffered, format="PNG")
+        for i in range(4):
+            # get random fitting bbox for inpainting
+            inpaint_bbox = get_random_bbox_within_bbox(
+                        bbox=suitable_inpaint_region_bbox, 
+                        min_width=street_image.width*0.4, 
+                        max_width=street_image.width*0.7, 
+                        min_height=street_image.height*0.4, 
+                        max_height=street_image.height*0.7,
+                        height_diff=height_diff,
+                        image_size=street_image.size
+                )
+
+            # Inpainting the image
+            print("Attempting Inpainting")
+            inpainted_image = inpaint_image(street_image.copy(), inpaint_bbox, req.prompt)
+            buffered = BytesIO()
+            inpainted_image.save(buffered, format="PNG")
+            inpainted_image_base64 = base64.b64encode(buffered.getvalue()).decode("utf-8")
+
+            results.append({
+                "image_number": i + 1, 
+                "prompt": req.prompt,
+                "prompt subjects": states.USER_PROMPT_SUMMARY, 
+                "inpaint_bbox_xyxy": list(inpaint_bbox),
+                "inpainted_image": inpainted_image_base64
+            })
+            print(f"Picture {i + 1} successfully processed")
+        
+        print(f"\nAll {len(results)} pictures successfully processed ")
+        
+        # Saving process inside of a JSON
+        output_json_filename = "output_gen.json"
+        try:
+            with open(output_json_filename, 'w', encoding='utf-8') as f:
+                json.dump(results, f, indent=4)
+            print(f"\n All results successfully saved in '{output_json_filename}'.")
+        except Exception as e:
+            print(f"Error when saving the JSON: {e}")
+
 
         return states.USER_PROMPT_SUMMARY
