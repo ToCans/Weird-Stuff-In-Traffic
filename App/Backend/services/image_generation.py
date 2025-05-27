@@ -41,6 +41,7 @@ async def generate(req: ImageGenerationPrompt) -> GeneratedImages:
         street_image, suitable_inpaint_region_bbox, height_diff = get_suitable_region(polygons_results, street_image)
 
         results = []
+        strength = 0.6
 
         for i in range(4):
             # get random fitting bbox for inpainting
@@ -56,7 +57,8 @@ async def generate(req: ImageGenerationPrompt) -> GeneratedImages:
 
             # Inpainting the image
             print("Attempting Inpainting")
-            inpainted_image = inpaint_image(street_image.copy(), inpaint_bbox, req.prompt)
+            inpainted_image = inpaint_image(street_image.copy(), inpaint_bbox, req.prompt, strength)
+            strength = max(1, strength + 0.1)
             buffered = BytesIO()
             inpainted_image.save(buffered, format="PNG")
             inpainted_image_base64 = base64.b64encode(buffered.getvalue()).decode("utf-8")

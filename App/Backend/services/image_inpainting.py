@@ -246,7 +246,7 @@ def create_mask_image(img_w, img_h, x1, y1, x2, y2):
     return mask
 
 
-def realvisxl_inpaint(x1, y1, x2, y2, image, user_prompt):
+def realvisxl_inpaint(x1, y1, x2, y2, image, user_prompt, strength):
     negative_prompt = "blurry, artifacts, distorted, mutated, extra limbs, extra objects, low quality, bad composition, background change, duplicated, cloned"
     styling_prompt = ", realistically integrated into a real-world Street scene, preserving the original background, lighting, camera angle and perspective"
     negative_prompt = "blurry, artifacts, distorted, extra limbs, low quality, unrealistic, ugly"
@@ -268,7 +268,7 @@ def realvisxl_inpaint(x1, y1, x2, y2, image, user_prompt):
         negative_prompt=negative_prompt,
         image=image,
         mask_image=mask_image,
-        strength=0.6,
+        strength=strength,
         num_inference_steps=40,
         guidance_scale=7.0,
         height=896,
@@ -280,10 +280,10 @@ def realvisxl_inpaint(x1, y1, x2, y2, image, user_prompt):
 
     return result.images[0]
 
-def inpaint_image(street_image, bbox, user_prompt):
+def inpaint_image(street_image, bbox, user_prompt, strength=0.6):
 
     x1, y1, x2, y2 = bbox
 
-    inpainted_image = realvisxl_inpaint(x1, y1, x2, y2, street_image, user_prompt)
+    inpainted_image = realvisxl_inpaint(x1, y1, x2, y2, street_image, user_prompt, strength)
 
     return inpainted_image
