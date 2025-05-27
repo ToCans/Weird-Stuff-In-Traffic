@@ -9,6 +9,27 @@ export type DetectionResultPayload = {
   points: number;
 };
 
+const scoreMessages: Record<string, string> = {
+  "0-25": "I genuinely have no idea what that was. Glorious.",
+  "25-40": "Not bad. Not bad at all. I almost choked on that one.",
+  "40-55": "Nice try — parts of your prompt were tricky, I’ll give you that.",
+  "55-70": "I expected a little more chaos from you by now",
+  "70-85": "Really? You can do better.",
+  "85-100": "Let me know when you're ready to play for real.",
+  default: "The analysis is complete.",
+};
+
+// Helper function to get the message based on score
+const getScoreSpecificMessage = (score: number): string => {
+  if (score >= 0 && score <= 25) return scoreMessages["0-25"];
+  if (score > 25 && score <= 40) return scoreMessages["25-40"];
+  if (score > 40 && score < 55) return scoreMessages["40-55"];
+  if (score >= 55 && score <= 70) return scoreMessages["55-70"];
+  if (score > 70 && score <= 85) return scoreMessages["70-85"];
+  if (score > 85 && score <= 100) return scoreMessages["85-100"];
+  return scoreMessages.default; // Default message for any other score
+};
+
 // Dialog message types - Allow 'expanded' to hold the structured payload
 export type DialogSequence = {
   initial: string;
@@ -71,15 +92,18 @@ export const DialogMessages = {
 };
 // Function to dynamically create the detection result message OBJECT
 export const updateDialogMessages = {
-  detectionResult: (score: number, points: number): DialogSequence => ({
-    initial: "Analysis Complete!", // Initial part remains simple
-    expanded: {
-      // Return the structured object
-      type: "detectionResult",
-      baseMessageInitial: `Based on my analysis, the similarity score is...`, // Short initial part for animation if needed
-      baseMessageExpanded: `Based on my analysis, the similarity score between your prompt and the selected image is `, // Base message for animation
-      score: score,
-      points: points,
-    },
-  }),
+  detectionResult: (score: number, points: number): DialogSequence => {
+    const specificMessage = getScoreSpecificMessage(score);
+
+    return {
+      initial: specificMessage, // Use the score-specific message for the initial, brief display
+      expanded: {
+        type: "detectionResult" as const,
+        baseMessageInitial: specificMessage,
+        baseMessageExpanded: `${specificMessage}\n\nAI analysis: ${score}% accuracy. You've received ${points} points.`,
+        score: score,
+        points: points,
+      },
+    };
+  },
 };

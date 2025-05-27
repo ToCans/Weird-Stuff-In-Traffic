@@ -5,7 +5,7 @@ import { Dialog } from "@/app/components/ui/Dialog";
 import { Header } from "@/app/components/game/Header";
 import { motion } from "framer-motion";
 import { TypeAnimation } from "react-type-animation";
-import { useRef, useEffect, useMemo, useState } from "react";
+import { useRef, useEffect, useMemo, useState, useCallback } from "react";
 import { PromptInput } from "@/app/components/ui/Input";
 import { ImageDisplay } from "@/app/components/game/ImageDisplay";
 import { DetectionResultPayload } from "@/app/constants/DialogMessages";
@@ -14,6 +14,14 @@ import { SlotmachineGame } from "@/app/components/game/SlotMachine";
 import { ClapwordsGame } from "@/app/components/game/ClapwordsGame";
 import { useChatLogic } from "@/app/hooks/useChatLogic";
 import { Modal } from "@/app/components/modals/ShareModal_1";
+import { ShareModal2 } from "@/app/components/modals/ShareModal_2";
+import dynamic from "next/dynamic";
+
+// Dynamically import TutorialTour with SSR disabled
+const TutorialTour = dynamic(
+  () => import("@/app/components/game/TutorialTour"),
+  { ssr: false }
+);
 
 export default function ChatPage() {
   const {
@@ -41,6 +49,11 @@ export default function ChatPage() {
   const [isShareModalOpen, setIsShareModalOpen] = useState<boolean>(false);
   const modalTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  const [isShareModal2Open, setIsShareModal2Open] = useState<boolean>(false);
+  const [sharedImageUrlForModal2, setSharedImageUrlForModal2] = useState<
+    string | null
+  >(null);
+
   useEffect(() => {
     if (modalTimeoutRef.current) {
       clearTimeout(modalTimeoutRef.current);
@@ -48,12 +61,7 @@ export default function ChatPage() {
     }
 
     if (signalModalOpen) {
-      console.log("Modal Signal Received: Setting 1s timeout to open modal.");
-
       modalTimeoutRef.current = setTimeout(() => {
-        console.log(
-          "Modal timeout finished, opening modal and resetting signal."
-        );
         setIsShareModalOpen(true);
         resetSignalModalOpen();
         modalTimeoutRef.current = null;
@@ -63,7 +71,7 @@ export default function ChatPage() {
     return () => {
       if (modalTimeoutRef.current) {
         clearTimeout(modalTimeoutRef.current);
-        console.log("Cleanup: Cleared modal timeout on unmount/signal change.");
+
         modalTimeoutRef.current = null;
       }
     };
@@ -115,6 +123,18 @@ export default function ChatPage() {
     resetDetectionCount();
   };
 
+  const handleOpenShareModal2 = useCallback((imageUrl: string) => {
+    setSharedImageUrlForModal2(imageUrl);
+    // TODO: Get relevant accuracy and points for this specific image
+    // For now, these are placeholders or could use global state if appropriate
+    setIsShareModal2Open(true);
+  }, []);
+
+  const handleCloseShareModal2 = useCallback(() => {
+    setIsShareModal2Open(false);
+    setSharedImageUrlForModal2(null);
+  }, []);
+
   return (
     <div className="h-screen w-screen flex flex-col bg-background overflow-hidden">
       <div style={{ height: "5rem" }}>
@@ -130,17 +150,46 @@ export default function ChatPage() {
         {/* Column 1: Dialog and Car */}
         <div className="w-full md:w-1/3 flex flex-col justify-between p-4 md:p-6 md:ml-10 md:mt-10 order-2 md:order-1">
           {/* Dialog */}
-          <div className="max-w-xs mx-auto md:mx-0 animate-slide-up-fade-in z-10 relative ">
+          <div
+            className="max-w-xs mx-auto md:mx-0 animate-slide-up-fade-in z-10 relative"
+            id="avatar-dialog-container"
+          >
             <Dialog>
-              <TypeAnimation
-                sequence={animationSequence}
-                wrapper="span"
-                speed={60}
-                style={{ whiteSpace: "pre-line", display: "inline-block" }}
-                repeat={0}
-                cursor={true}
-                key={JSON.stringify(dialogSequence)}
-              />
+              {typeof dialogSequence.expanded === "object" &&
+              dialogSequence.expanded.type === "detectionResult" ? (
+                <TypeAnimation
+                  sequence={[
+                    dialogSequence.expanded.baseMessageInitial,
+                    1000,
+                    dialogSequence.expanded.baseMessageExpanded,
+                    () => {
+                      const detectionResult =
+                        dialogSequence.expanded as DetectionResultPayload;
+                      finalizeScoreUpdate(
+                        detectionResult.points,
+                        detectionResult.score,
+                        detectionCount
+                      );
+                    },
+                  ]}
+                  wrapper="span"
+                  speed={60}
+                  style={{ whiteSpace: "pre-line", display: "inline-block" }}
+                  repeat={0}
+                  cursor={true}
+                  key={JSON.stringify(dialogSequence)}
+                />
+              ) : (
+                <TypeAnimation
+                  sequence={animationSequence}
+                  wrapper="span"
+                  speed={60}
+                  style={{ whiteSpace: "pre-line", display: "inline-block" }}
+                  repeat={0}
+                  cursor={true}
+                  key={JSON.stringify(dialogSequence)}
+                />
+              )}
             </Dialog>
           </div>
           {/* Car image */}
@@ -160,10 +209,12 @@ export default function ChatPage() {
           {/* Content Area: Conditionally render Chat or Game */}
           <div
             ref={chatContainerRef}
-            className={`flex-1 md:overflow-y-auto relative z-0 space-y-6 custom-scrollbar p-4 ${
+            className={`flex-1 relative z-0 space-y-6 custom-scrollbar p-4 ${
               activeView !== "chat" || messages.length === 0
                 ? "flex flex-col justify-center items-center"
                 : ""
+            } ${
+              activeView === "chat" ? "md:overflow-y-auto" : "overflow-hidden"
             }`}
             style={{ minHeight: "300px" }}
           >
@@ -222,6 +273,8 @@ export default function ChatPage() {
                               }
                               isDetecting={msg.isDetecting}
                               selectedImageIndex={msg.selectedImageIndex}
+                              onShare={handleOpenShareModal2}
+                              detectedImageUrl={msg.detectedImageUrl}
                             />
                           </div>
                         )}
@@ -270,7 +323,7 @@ export default function ChatPage() {
           </motion.div>
         </div>
       </div>
-
+      <TutorialTour />
       <Modal
         isOpen={isShareModalOpen}
         onClose={handleCloseShareModal}
@@ -285,6 +338,23 @@ export default function ChatPage() {
           </div>
         }
       ></Modal>
+      {/* Render ShareModal2 */}
+      <ShareModal2
+        isOpen={isShareModal2Open}
+        onClose={handleCloseShareModal2}
+        imageUrl={sharedImageUrlForModal2}
+        accuracy={
+          messages.find(
+            (msg) => msg.detectedImageUrl === sharedImageUrlForModal2
+          )?.lastDetectionAccuracy ?? null
+        }
+        pointsReceived={
+          messages.find(
+            (msg) => msg.detectedImageUrl === sharedImageUrlForModal2
+          )?.lastDetectionPoints ?? null
+        }
+        totalScore={earnedPoints}
+      />
     </div>
   );
 }

@@ -53,7 +53,10 @@ export function Header({
             </Link>
 
             {isChatPage && (
-              <div className="flex items-center gap-6">
+              <div
+                className="flex items-center gap-6"
+                id="score-display-container"
+              >
                 {/* Earned Points Counter */}
                 <div className="text-white font-mono flex items-center gap-2">
                   {/* Hide label on mobile */}
@@ -88,6 +91,7 @@ export function Header({
             )}
             {/* Replace the div with IconButton component */}
             <IconButton
+              id="game-header-info-button"
               icon={infoIcon}
               onClick={toggleInfoModal}
               ariaLabel="Game Info"

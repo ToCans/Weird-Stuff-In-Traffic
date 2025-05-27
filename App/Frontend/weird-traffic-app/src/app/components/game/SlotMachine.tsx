@@ -51,9 +51,9 @@ export const SlotmachineGame: React.FC<SlotmachineGameProps> = ({
 
     // Start timeout for spin duration
     const spinTimeout = setTimeout(() => {
-      const finalWord1 = getRandomWord(slotMachineWords.adjectives);
-      const finalWord2 = getRandomWord(slotMachineWords.nouns);
-      const finalWord3 = getRandomWord(slotMachineWords.verbs);
+      const finalWord1 = getRandomWord(slotMachineWords.nouns);
+      const finalWord2 = getRandomWord(slotMachineWords.verbs);
+      const finalWord3 = getRandomWord(slotMachineWords.places);
 
       setWord1(finalWord1);
       setWord2(finalWord2);
@@ -76,9 +76,9 @@ export const SlotmachineGame: React.FC<SlotmachineGameProps> = ({
     let animationInterval: ReturnType<typeof setInterval> | undefined;
     if (isSpinning) {
       animationInterval = setInterval(() => {
-        setDisplayWord1(getRandomWord(slotMachineWords.adjectives));
-        setDisplayWord2(getRandomWord(slotMachineWords.nouns));
-        setDisplayWord3(getRandomWord(slotMachineWords.verbs));
+        setDisplayWord1(getRandomWord(slotMachineWords.nouns));
+        setDisplayWord2(getRandomWord(slotMachineWords.verbs));
+        setDisplayWord3(getRandomWord(slotMachineWords.places));
       }, 50); // Update every 50ms for fast visual effect
     } else {
       // If not spinning, ensure display words match final words (or initial '---')
@@ -152,12 +152,12 @@ export const SlotmachineGame: React.FC<SlotmachineGameProps> = ({
   };
 
   return (
-    <div className="relative flex flex-col items-center justify-center h-full pt-16 p-4 sm:pt-4 gap-6 animate-slide-up-fade-in overflow-hidden">
+    <div className="relative flex flex-col items-center justify-center h-full w-full pt-16 p-4 sm:pt-4 gap-6 animate-slide-up-fade-in overflow-hidden">
       {/* Back to Chat Button */}
       <button
         onClick={handleBackToChat}
         onKeyDown={handleBackKeyDown}
-        className="absolute top-4 left-4 z-10 flex items-center gap-2 text-white font-mono text-sm hover:underline cursor-pointer"
+        className="absolute bottom-1 left-2 z-10 flex items-center gap-2 text-white font-mono text-sm hover:underline cursor-pointer"
         aria-label="Back to chat view"
       >
         <ArrowLeft size={18} />
@@ -167,30 +167,29 @@ export const SlotmachineGame: React.FC<SlotmachineGameProps> = ({
       <h2 className="text-[24px] font-mono text-white mb-2 text-center mt-8">
         Spin the slotmachine, until you have a prompt you like!
       </h2>
-
       {/* Word Boxes */}
-      <div className="flex flex-col sm:flex-row gap-4 mb-4 w-full max-w-md justify-center">
-        {/* Box 1 - Adjective */}
+      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-4 w-full max-w-xs sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl px-2 sm:px-0 justify-center">
+        {/* Box 1 - Noun */}
         <div
-          className={`bg-[var(--dark-gray)] p-4 border-2 border-[var(--green)] rounded-[24px] text-white font-mono font-regular min-w-[200px] text-center transition-all duration-200 ${
+          className={`bg-[var(--dark-gray)] p-3 sm:p-4 border-2 border-[var(--green)] rounded-[18px] sm:rounded-[24px] text-white font-mono text-sm sm:text-base min-h-[48px] sm:min-h-[56px] w-full flex items-center justify-center text-center transition-all duration-200 ${
             !isSpinning && spinCompleted
               ? "cursor-pointer hover:shadow-[0_0_16px_#B9E55A] hover:scale-[1.02]"
               : "cursor-default"
-          } ${isSpinning ? "animate-pulse" : ""}`} // Add pulse animation during spin
+          } ${isSpinning ? "animate-pulse" : ""}`}
           onClick={() => handleWordClick(displayWord1)}
           onKeyDown={(e) => handleWordKeyDown(e, displayWord1)}
-          tabIndex={!isSpinning && spinCompleted ? 0 : -1} // Focusable only when spin is complete
+          tabIndex={!isSpinning && spinCompleted ? 0 : -1}
           role="button"
-          aria-live="polite" // Announce changes during spin
-          aria-label={`Adjective: ${
+          aria-live="polite"
+          aria-label={`Noun: ${
             isSpinning ? "Spinning" : displayWord1 || "---"
           }. ${!isSpinning && spinCompleted ? "Click to add to prompt." : ""}`}
         >
           {displayWord1}
         </div>
-        {/* Box 2 - Noun */}
+        {/* Box 2 - Verb */}
         <div
-          className={`bg-[var(--dark-gray)] p-4 border-2 border-[var(--green)] rounded-[24px] text-white font-mono font-regular min-w-[200px] text-center transition-all duration-200 ${
+          className={`bg-[var(--dark-gray)] p-3 sm:p-4 border-2 border-[var(--green)] rounded-[18px] sm:rounded-[24px] text-white font-mono text-sm sm:text-base min-h-[48px] sm:min-h-[56px] w-full flex items-center justify-center text-center transition-all duration-200 ${
             !isSpinning && spinCompleted
               ? "cursor-pointer hover:shadow-[0_0_16px_#B9E55A] hover:scale-[1.02]"
               : "cursor-default"
@@ -200,15 +199,15 @@ export const SlotmachineGame: React.FC<SlotmachineGameProps> = ({
           tabIndex={!isSpinning && spinCompleted ? 0 : -1}
           role="button"
           aria-live="polite"
-          aria-label={`Noun: ${
+          aria-label={`Verb: ${
             isSpinning ? "Spinning" : displayWord2 || "---"
           }. ${!isSpinning && spinCompleted ? "Click to add to prompt." : ""}`}
         >
           {displayWord2}
         </div>
-        {/* Box 3 - Verb */}
+        {/* Box 3 - Place */}
         <div
-          className={`bg-[var(--dark-gray)] p-4 border-2 border-[var(--green)] rounded-[24px] text-white font-mono font-regular min-w-[200px] text-center transition-all duration-200 ${
+          className={`bg-[var(--dark-gray)] p-3 sm:p-4 border-2 border-[var(--green)] rounded-[18px] sm:rounded-[24px] min-w-[260px] text-white font-mono text-sm sm:text-base min-h-[48px] sm:min-h-[56px] w-full flex items-center justify-center text-center transition-all duration-200 ${
             !isSpinning && spinCompleted
               ? "cursor-pointer hover:shadow-[0_0_16px_#B9E55A] hover:scale-[1.02]"
               : "cursor-default"
@@ -218,7 +217,7 @@ export const SlotmachineGame: React.FC<SlotmachineGameProps> = ({
           tabIndex={!isSpinning && spinCompleted ? 0 : -1}
           role="button"
           aria-live="polite"
-          aria-label={`Verb: ${
+          aria-label={`Place: ${
             isSpinning ? "Spinning" : displayWord3 || "---"
           }. ${!isSpinning && spinCompleted ? "Click to add to prompt." : ""}`}
         >

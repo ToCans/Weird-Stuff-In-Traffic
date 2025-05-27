@@ -3,14 +3,16 @@
 export type ActiveView = "chat" | "slotmachine" | "clapwords" | "fillblank";
 
 // Let's define message types
-export type Message = {
+export interface Message {
   id: number;
-  type: "user" | "assistant" | "image_grid"; // Include image_grid type
+  type: "user" | "assistant" | "image_grid" | "loading" | "error"; // Include image_grid type and new types
   content: string | string[]; // Content can be string or array of strings (for image URLs)
-  isLoading?: boolean; // Optional loading state, primarily for image_grid
-  selectedImageIndex?: number | null; // Optional: Index of the image selected by the user
-  isDetecting?: boolean; // Optional: Indicator for detection loading
-  detectedImageUrl?: string; // Optional: Base64 of the image returned by detection API
-};
+  isLoading?: boolean; // Loading state, primarily for image_grid
+  selectedImageIndex?: number | null; // Index of the image selected by the user
+  isDetecting?: boolean; // Indicator for detection loading
+  detectedImageUrl?: string | null; //Base64 of the image returned by detection API
+  lastDetectionAccuracy?: number | null;
+  lastDetectionPoints?: number | null;
+}
 
 // Add any other types specific to the chat feature here in the future

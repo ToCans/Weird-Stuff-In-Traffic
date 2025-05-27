@@ -70,7 +70,10 @@ export const PromptInput: React.FC<PromptInputProps> = ({
 
   return (
     // Main container
-    <div className="box-border flex flex-col items-start p-6 gap-6 w-full bg-[var(--dark-gray)] border-2 border-[var(--gray)] rounded-[32px]">
+    <div
+      className="box-border flex flex-col items-start p-6 gap-6 w-full bg-[var(--dark-gray)] border-2 border-[var(--gray)] rounded-[32px]"
+      id="creative-prompt-input"
+    >
       {/* Input area */}
       <div className="relative w-full flex items-center">
         <TextareaAutosize
@@ -90,7 +93,10 @@ export const PromptInput: React.FC<PromptInputProps> = ({
       {/* Button row */}
       <div className="w-full flex justify-between items-center">
         {/* Suggestion buttons */}
-        <div className="flex flex-wrap gap-2">
+        <div
+          id="inspiration-options-container"
+          className="flex flex-wrap gap-2"
+        >
           <Button
             variant={activeView === "slotmachine" ? "active" : "secondary"}
             className={suggestionButtonBaseClasses} // Use base classes here

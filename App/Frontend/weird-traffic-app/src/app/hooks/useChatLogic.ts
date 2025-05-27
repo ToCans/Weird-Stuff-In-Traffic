@@ -155,8 +155,14 @@ export function useChatLogic() {
       const result: DetectApiResponse = await response.json();
       const similarityScore = result.similarityScore;
       const detectedImage = result.detectedImage; // Extract detectedImage
+      const points = calculateUserScore(similarityScore);
 
-      console.log("Detection API call successful. Score:", similarityScore);
+      console.log(
+        "Detection API call successful. Score:",
+        similarityScore,
+        "Points:",
+        points
+      );
 
       setMessages((prevMessages) =>
         prevMessages.map((msg) =>
@@ -165,13 +171,14 @@ export function useChatLogic() {
                 ...msg,
                 isDetecting: false,
                 detectedImageUrl: detectedImage, // Store the detected image URL
+                lastDetectionAccuracy: similarityScore, // Store accuracy
+                lastDetectionPoints: points, // Store points
               }
             : msg
         )
       );
 
       if (typeof similarityScore === "number") {
-        const points = calculateUserScore(similarityScore);
         // Increment detection count *after* successful API call and *before* setting dialog
         let updatedDetectionCount = 0;
         setDetectionCount((prev) => {
@@ -320,7 +327,6 @@ export function useChatLogic() {
   // This directly manipulates the view state managed here
   const handleSwitchView = (view: ActiveView) => {
     setActiveView(view);
-    console.log("Switching view to:", view);
 
     // Set dialog based on the selected view
     switch (view) {

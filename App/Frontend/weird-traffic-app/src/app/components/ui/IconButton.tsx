@@ -2,6 +2,7 @@ import React from "react";
 import clsx from "clsx";
 
 interface IconButtonProps {
+  id?: string;
   icon: React.ReactNode;
   onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
   ariaLabel: string;
@@ -14,6 +15,7 @@ interface IconButtonProps {
 }
 
 export const IconButton: React.FC<IconButtonProps> = ({
+  id,
   icon,
   onClick,
   ariaLabel,
@@ -38,6 +40,7 @@ export const IconButton: React.FC<IconButtonProps> = ({
   if (variant === "primary") {
     return (
       <button
+        id={id}
         type="button"
         onClick={handleButtonClick}
         aria-label={ariaLabel}
@@ -66,6 +69,7 @@ export const IconButton: React.FC<IconButtonProps> = ({
 
   return (
     <button
+      id={id}
       type="button"
       onClick={handleButtonClick}
       aria-label={ariaLabel}
