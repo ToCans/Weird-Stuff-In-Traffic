@@ -152,12 +152,12 @@ export const SlotmachineGame: React.FC<SlotmachineGameProps> = ({
   };
 
   return (
-    <div className="relative flex flex-col items-center justify-center h-full pt-16 p-4 sm:pt-4 gap-6 animate-slide-up-fade-in overflow-hidden">
+    <div className="relative flex flex-col items-center justify-center h-full w-full pt-16 p-4 sm:pt-4 gap-6 animate-slide-up-fade-in overflow-hidden">
       {/* Back to Chat Button */}
       <button
         onClick={handleBackToChat}
         onKeyDown={handleBackKeyDown}
-        className="absolute top-4 left-4 z-10 flex items-center gap-2 text-white font-mono text-sm hover:underline cursor-pointer"
+        className="absolute bottom-1 left-2 z-10 flex items-center gap-2 text-white font-mono text-sm hover:underline cursor-pointer"
         aria-label="Back to chat view"
       >
         <ArrowLeft size={18} />
@@ -168,10 +168,10 @@ export const SlotmachineGame: React.FC<SlotmachineGameProps> = ({
         Spin the slotmachine, until you have a prompt you like!
       </h2>
       {/* Word Boxes */}
-      <div className="flex flex-col sm:flex-row gap-4 mb-4 w-full max-w-md justify-center">
+      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-4 w-full max-w-xs sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl px-2 sm:px-0 justify-center">
         {/* Box 1 - Noun */}
         <div
-          className={`bg-[var(--dark-gray)] p-4 border-2 border-[var(--green)] rounded-[24px] text-white font-mono font-regular min-w-[260px] text-center transition-all duration-200 ${
+          className={`bg-[var(--dark-gray)] p-3 sm:p-4 border-2 border-[var(--green)] rounded-[18px] sm:rounded-[24px] text-white font-mono text-sm sm:text-base min-h-[48px] sm:min-h-[56px] w-full flex items-center justify-center text-center transition-all duration-200 ${
             !isSpinning && spinCompleted
               ? "cursor-pointer hover:shadow-[0_0_16px_#B9E55A] hover:scale-[1.02]"
               : "cursor-default"
@@ -189,7 +189,7 @@ export const SlotmachineGame: React.FC<SlotmachineGameProps> = ({
         </div>
         {/* Box 2 - Verb */}
         <div
-          className={`bg-[var(--dark-gray)] p-4 border-2 border-[var(--green)] rounded-[24px] text-white font-mono font-regular min-w-[260px] text-center transition-all duration-200 ${
+          className={`bg-[var(--dark-gray)] p-3 sm:p-4 border-2 border-[var(--green)] rounded-[18px] sm:rounded-[24px] text-white font-mono text-sm sm:text-base min-h-[48px] sm:min-h-[56px] w-full flex items-center justify-center text-center transition-all duration-200 ${
             !isSpinning && spinCompleted
               ? "cursor-pointer hover:shadow-[0_0_16px_#B9E55A] hover:scale-[1.02]"
               : "cursor-default"
@@ -207,7 +207,7 @@ export const SlotmachineGame: React.FC<SlotmachineGameProps> = ({
         </div>
         {/* Box 3 - Place */}
         <div
-          className={`bg-[var(--dark-gray)] p-4 border-2 border-[var(--green)] rounded-[24px] text-white font-mono font-regular min-w-[260px] text-center transition-all duration-200 ${
+          className={`bg-[var(--dark-gray)] p-3 sm:p-4 border-2 border-[var(--green)] rounded-[18px] sm:rounded-[24px] min-w-[260px] text-white font-mono text-sm sm:text-base min-h-[48px] sm:min-h-[56px] w-full flex items-center justify-center text-center transition-all duration-200 ${
             !isSpinning && spinCompleted
               ? "cursor-pointer hover:shadow-[0_0_16px_#B9E55A] hover:scale-[1.02]"
               : "cursor-default"

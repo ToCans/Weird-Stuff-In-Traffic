@@ -1,6 +1,6 @@
 import React, { useCallback } from "react";
-import Image from "next/image"; // Better to use Next.js Image
-import { Download } from "lucide-react"; // Import Download icon
+import Image from "next/image";
+import { Download, ExternalLink } from "lucide-react";
 
 interface ImageDisplayProps {
   imageUrls: string[]; // Will take array instead of single URL
@@ -10,6 +10,7 @@ interface ImageDisplayProps {
   isDetecting?: boolean; // New prop: Is detection loading?
   selectedImageIndex?: number | null; // New prop: Selected index from parent
   detectedImageUrl?: string | null; // Optional: Base64 URL from detection API
+  onShare?: (imageUrl: string) => void; // New prop for handling share
 }
 
 export const ImageDisplay: React.FC<ImageDisplayProps> = ({
@@ -20,6 +21,7 @@ export const ImageDisplay: React.FC<ImageDisplayProps> = ({
   isDetecting = false, // Default value for new prop
   selectedImageIndex = null, // Default value for new prop
   detectedImageUrl = null, // Optional: Base64 URL from detection API
+  onShare,
 }) => {
   const handleImageClick = useCallback(
     (imageUrl: string, index: number) => {
@@ -69,6 +71,33 @@ export const ImageDisplay: React.FC<ImageDisplayProps> = ({
     }
   };
 
+  const handleShare = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      event.stopPropagation(); // Prevent triggering image selection or other parent events
+      if (selectedImageIndex === null || !imageUrls[selectedImageIndex]) return;
+
+      const imageUrlToShare = detectedImageUrl ?? imageUrls[selectedImageIndex];
+
+      if (onShare) {
+        onShare(imageUrlToShare);
+      }
+      console.log("Attempting to share:", imageUrlToShare);
+    },
+    [imageUrls, selectedImageIndex, detectedImageUrl, onShare]
+  );
+
+  const handleShareKeyDown = (
+    event: React.KeyboardEvent<HTMLButtonElement>
+  ) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      event.stopPropagation();
+      // We need to ensure handleShare has access to the event if it needs it,
+      // but since it's a simple button click, casting to `any` or creating a synthetic event is fine.
+      handleShare(event as any);
+    }
+  };
+
   // Show nothing if imageUrls is empty AND not in loading state
   if ((!imageUrls || imageUrls.length === 0) && !isLoading) {
     return null;
@@ -89,17 +118,32 @@ export const ImageDisplay: React.FC<ImageDisplayProps> = ({
             sizes="100vw" // Optimization for different screen sizes
           />
 
-          {/* Download Button - Appears on hover over the container div */}
-          <button
-            onClick={handleDownload}
-            onKeyDown={handleDownloadKeyDown}
-            aria-label="Download image"
-            tabIndex={0} // Make focusable
-            // Styling: positioned top-right, appears on group hover, includes focus styles
-            className="absolute top-4 right-4 z-20 p-2 text-white rounded-full opacity-0 group-hover:opacity-100 hover:bg-[var(--gray)] transition-all duration-200 cursor-pointer"
-          >
-            <Download size={20} />
-          </button>
+          {/* Action Buttons Container - Appears on hover over the container div */}
+          <div className="absolute top-4 right-4 z-20 flex gap-2 opacity-0 group-hover:opacity-100 transition-all duration-200">
+            {/* Download Button */}
+            <button
+              onClick={handleDownload}
+              onKeyDown={handleDownloadKeyDown}
+              aria-label="Download image"
+              tabIndex={0}
+              className="p-2 text-white rounded-full hover:bg-[var(--gray)] cursor-pointer"
+            >
+              <Download size={20} />
+            </button>
+
+            {/* Share Button */}
+            {onShare && ( // Only render if onShare is provided
+              <button
+                onClick={handleShare}
+                onKeyDown={handleShareKeyDown}
+                aria-label="Share image"
+                tabIndex={0}
+                className="p-2 text-white rounded-full hover:bg-[var(--gray)] cursor-pointer"
+              >
+                <ExternalLink size={20} />
+              </button>
+            )}
+          </div>
 
           {/* If detection is loading, show the indicator and overlay */}
           {/* Ensure overlay is below the download button (lower z-index or appears later in DOM) */}

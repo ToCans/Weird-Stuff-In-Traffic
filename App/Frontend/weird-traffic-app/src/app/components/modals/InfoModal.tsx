@@ -62,7 +62,7 @@ export const InfoModal: React.FC<InfoModalProps> = ({ isOpen, onClose }) => {
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-black/60 backdrop-blur-sm p-4 flex items-center justify-center z-50 "
+      className="fixed inset-0 bg-black/70 p-4 flex items-center justify-center z-50 animate-slide-up-fade-in"
       onClick={handleClose}
       onKeyDown={handleOuterKeyDown}
       role="dialog"

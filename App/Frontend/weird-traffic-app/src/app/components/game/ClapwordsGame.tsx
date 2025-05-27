@@ -202,7 +202,6 @@ export const ClapwordsGame: React.FC<ClapwordsGameProps> = ({
       gameAreaRect.height < minRequiredHeightForAnimation ||
       gameAreaRect.width < WORD_WIDTH
     ) {
-      // console.warn("animateWords: Area too small, skipping word updates this frame.");
       animationRef.current = requestAnimationFrame(animateWords);
       return;
     }
@@ -303,12 +302,12 @@ export const ClapwordsGame: React.FC<ClapwordsGameProps> = ({
   return (
     <div
       ref={containerRef}
-      className="relative flex flex-col items-center justify-center h-full w-full p-4 gap-6 animate-slide-up-fade-in overflow-hidden"
+      className="relative flex flex-col items-center justify-center h-full w-full pt-16 p-4 sm:pt-4 gap-6 animate-slide-up-fade-in overflow-hidden"
     >
       {/* Back to Chat Button */}
       <button
         onClick={handleBackToChat}
-        className="absolute top-4 left-4 z-30 flex items-center gap-2 text-white font-mono text-sm hover:underline cursor-pointer"
+        className="absolute bottom-1 left-2 z-30 flex items-center gap-2 text-white font-mono text-sm hover:underline cursor-pointer"
         aria-label="Back to chat view"
         tabIndex={0}
       >

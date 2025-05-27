@@ -12,7 +12,7 @@ export type DetectionResultPayload = {
 const scoreMessages: Record<string, string> = {
   "0-25": "I genuinely have no idea what that was. Glorious.",
   "25-40": "Not bad. Not bad at all. I almost choked on that one.",
-  "40-55": "AI analysis complete. Here are the results.",
+  "40-55": "Nice try — parts of your prompt were tricky, I’ll give you that.",
   "55-70": "I expected a little more chaos from you by now",
   "70-85": "Really? You can do better.",
   "85-100": "Let me know when you're ready to play for real.",

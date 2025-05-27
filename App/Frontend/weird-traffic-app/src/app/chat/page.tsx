@@ -5,7 +5,7 @@ import { Dialog } from "@/app/components/ui/Dialog";
 import { Header } from "@/app/components/game/Header";
 import { motion } from "framer-motion";
 import { TypeAnimation } from "react-type-animation";
-import { useRef, useEffect, useMemo, useState } from "react";
+import { useRef, useEffect, useMemo, useState, useCallback } from "react";
 import { PromptInput } from "@/app/components/ui/Input";
 import { ImageDisplay } from "@/app/components/game/ImageDisplay";
 import { DetectionResultPayload } from "@/app/constants/DialogMessages";
@@ -14,6 +14,7 @@ import { SlotmachineGame } from "@/app/components/game/SlotMachine";
 import { ClapwordsGame } from "@/app/components/game/ClapwordsGame";
 import { useChatLogic } from "@/app/hooks/useChatLogic";
 import { Modal } from "@/app/components/modals/ShareModal_1";
+import { ShareModal2 } from "@/app/components/modals/ShareModal_2";
 import dynamic from "next/dynamic";
 
 // Dynamically import TutorialTour with SSR disabled
@@ -48,6 +49,11 @@ export default function ChatPage() {
   const [isShareModalOpen, setIsShareModalOpen] = useState<boolean>(false);
   const modalTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  const [isShareModal2Open, setIsShareModal2Open] = useState<boolean>(false);
+  const [sharedImageUrlForModal2, setSharedImageUrlForModal2] = useState<
+    string | null
+  >(null);
+
   useEffect(() => {
     if (modalTimeoutRef.current) {
       clearTimeout(modalTimeoutRef.current);
@@ -55,12 +61,7 @@ export default function ChatPage() {
     }
 
     if (signalModalOpen) {
-      console.log("Modal Signal Received: Setting 1s timeout to open modal.");
-
       modalTimeoutRef.current = setTimeout(() => {
-        console.log(
-          "Modal timeout finished, opening modal and resetting signal."
-        );
         setIsShareModalOpen(true);
         resetSignalModalOpen();
         modalTimeoutRef.current = null;
@@ -70,7 +71,7 @@ export default function ChatPage() {
     return () => {
       if (modalTimeoutRef.current) {
         clearTimeout(modalTimeoutRef.current);
-        console.log("Cleanup: Cleared modal timeout on unmount/signal change.");
+
         modalTimeoutRef.current = null;
       }
     };
@@ -121,6 +122,18 @@ export default function ChatPage() {
     setIsShareModalOpen(false);
     resetDetectionCount();
   };
+
+  const handleOpenShareModal2 = useCallback((imageUrl: string) => {
+    setSharedImageUrlForModal2(imageUrl);
+    // TODO: Get relevant accuracy and points for this specific image
+    // For now, these are placeholders or could use global state if appropriate
+    setIsShareModal2Open(true);
+  }, []);
+
+  const handleCloseShareModal2 = useCallback(() => {
+    setIsShareModal2Open(false);
+    setSharedImageUrlForModal2(null);
+  }, []);
 
   return (
     <div className="h-screen w-screen flex flex-col bg-background overflow-hidden">
@@ -260,6 +273,8 @@ export default function ChatPage() {
                               }
                               isDetecting={msg.isDetecting}
                               selectedImageIndex={msg.selectedImageIndex}
+                              onShare={handleOpenShareModal2}
+                              detectedImageUrl={msg.detectedImageUrl}
                             />
                           </div>
                         )}
@@ -323,6 +338,23 @@ export default function ChatPage() {
           </div>
         }
       ></Modal>
+      {/* Render ShareModal2 */}
+      <ShareModal2
+        isOpen={isShareModal2Open}
+        onClose={handleCloseShareModal2}
+        imageUrl={sharedImageUrlForModal2}
+        accuracy={
+          messages.find(
+            (msg) => msg.detectedImageUrl === sharedImageUrlForModal2
+          )?.lastDetectionAccuracy ?? null
+        }
+        pointsReceived={
+          messages.find(
+            (msg) => msg.detectedImageUrl === sharedImageUrlForModal2
+          )?.lastDetectionPoints ?? null
+        }
+        totalScore={earnedPoints}
+      />
     </div>
   );
 }
