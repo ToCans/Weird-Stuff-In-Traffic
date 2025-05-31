@@ -96,11 +96,9 @@ async def detect(req: DetectionRequest) -> DetectionResponse:
             device=states.DEVICE
         )
 
-        # Determining Final Scoring
-        response = DetectionResponse(
+        # Returning detection with final score
+        return DetectionResponse(
             prompt=req.prompt,
             imageBase64=encoded_image,
             score=float(1 / len(detection_summary)) if detection_summary else 0.0
         )
-
-        return response

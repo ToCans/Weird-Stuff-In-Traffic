@@ -11,6 +11,7 @@ class ImageGenerationPrompt(BaseModel):
 
 class GeneratedImage(BaseModel):
     """Single image prompted for image generation."""
+    prompt: str
     imageBase64: str
 
 class GeneratedImages(BaseModel):

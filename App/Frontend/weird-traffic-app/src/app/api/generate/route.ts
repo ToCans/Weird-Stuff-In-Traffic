@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import path from "path";
 import fs from "fs/promises";
 
+// Defining the backend URL from the .evn file or defaulting to localhost
+const backendUrl = process.env.BACKEND_API_BASE_URL || "http://127.0.0.1:8000";
+
 // Helper function to convert image to base64
 async function imageToBase64(filePath: string): Promise<string | null> {
   try {
@@ -18,47 +21,67 @@ async function imageToBase64(filePath: string): Promise<string | null> {
   }
 }
 
-// Helper function to introduce delay
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
 export async function POST(request: Request) {
   try {
-    // Although we receive the prompt, we don't use it for simulation
-    // const { prompt } = await request.json();
-    // console.log("Received prompt for generation:", prompt);
+    // Get the prompt from the incoming request
+    const { prompt } = await request.json();
 
-    console.log("Simulating generation delay..."); // Log delay start
-    await delay(7000); // Add 7 seconds delay
-    console.log("Generation delay finished."); // Log delay end
-
-    const placeholderImagePaths = [
-      "placeholder_1.png",
-      "placeholder_2.png",
-      "placeholder_3.png",
-      "placeholder_4.png",
-    ];
-
-    const base64Images = await Promise.all(
-      placeholderImagePaths.map(imageToBase64)
-    );
-
-    // Filter out any null results in case of errors
-    const validBase64Images = base64Images.filter(
-      (img): img is string => img !== null
-    );
-
-    if (validBase64Images.length < placeholderImagePaths.length) {
-      // Handle case where some images couldn't be processed
-      console.warn("Could not process all placeholder images.");
-      // Decide response: return partial data or error
+    if (!prompt) {
+      return NextResponse.json(
+        { message: "Prompt is required" },
+        { status: 400 }
+      );
     }
 
-    // Return the base64 image data URIs
-    return NextResponse.json({ images: validBase64Images });
+    console.log(
+      `Forwarding generate request for prompt: "${prompt}" to ${backendUrl}/generate`
+    );
+
+    // Forward the request to the actual backend API
+    const backendResponse = await fetch(`${backendUrl}/generate`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        // Forward any other necessary headers from the original request if needed
+        // 'Authorization': request.headers.get('Authorization') || '',
+      },
+      body: JSON.stringify({ prompt }),
+    });
+
+    console.log("Response from backend:", backendResponse);
+
+    // Check if the backend request was successful
+    if (!backendResponse.ok) {
+      const errorData = await backendResponse.text();
+      console.error(
+        `Backend API /generate error: ${backendResponse.status}`,
+        errorData
+      );
+      // Return the error status and message from the backend
+      return NextResponse.json(
+        { message: `Backend error: ${errorData}` },
+        { status: backendResponse.status }
+      );
+    }
+
+    // Get the response data (assuming it's JSON with { images: [...] })
+    const data = await backendResponse.json();
+
+    // Return the response from the backend to the frontend
+    return NextResponse.json(data);
   } catch (error) {
-    console.error("Error in generate API:", error);
+    console.error("Error forwarding request to /generate backend:", error);
+    // Handle potential network errors or JSON parsing errors
+    if (error instanceof SyntaxError) {
+      return NextResponse.json(
+        {
+          message: "Invalid JSON received from backend or invalid request body",
+        },
+        { status: 500 }
+      );
+    }
     return NextResponse.json(
-      { message: "Internal Server Error" },
+      { message: "Internal Server Error while contacting backend" },
       { status: 500 }
     );
   }

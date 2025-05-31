@@ -11,11 +11,15 @@ from fastapi import FastAPI
 # AI Related Imports
 from ultralytics import YOLO
 from diffusers import StableDiffusionXLInpaintPipeline, DPMSolverMultistepScheduler
+from detectron2.engine import DefaultPredictor
 import transformers
 import torch
 
 # Schema Imports
 from schemas.images import DetectionRequest, DetectionResponse, ImageGenerationPrompt, GeneratedImages
+
+# Model Config Imports
+from models.configurations import detectron_cfg
 
 # Function Imports
 from services import states
@@ -42,7 +46,7 @@ async def lifespan(_):
     states.BACKEND_LOCK = asyncio.Lock()
     states.GENERATION_MODEL = StableDiffusionXLInpaintPipeline.from_pretrained("stabilityai/stable-diffusion-xl-base-1.0",torch_dtype=torch.float16, variant="fp16", safety_checker=None).to(states.DEVICE)
     states.GENERATION_MODEL.scheduler = DPMSolverMultistepScheduler.from_config(states.GENERATION_MODEL.scheduler.config)
-    states.WEIRD_DETECTION_MODEL = YOLO(full_weird_obj_detection_model_path).to(states.DEVICE)
+    states.WEIRD_DETECTION_MODEL = DefaultPredictor(detectron_cfg)
     states.STREET_DETECTION_MODEL = YOLO(full_street_detection_detection_model_path).to(states.DEVICE)
     states.DETECTION_DESCRIPTION_PROCESSOR = transformers.Qwen2VLProcessor.from_pretrained("Qwen/Qwen2-VL-2B-Instruct", use_fast=True)
     states.DETECTION_DESCRIPTION_MODEL = transformers.Qwen2VLForConditionalGeneration.from_pretrained("Qwen/Qwen2-VL-2B-Instruct", torch_dtype=torch.float16).to(states.DEVICE)
@@ -67,7 +71,7 @@ async def detect_endpoint(req: DetectionRequest):
     """Endpoint for detecting weird objects in an image."""
     return await detect(req)
 
-@app.post("/generate")
+@app.post("/generate", response_model=GeneratedImages)
 async def generate_endpoint(req: ImageGenerationPrompt):
     """Endpoint for detecting weird objects in an image."""
     return await generate(req)

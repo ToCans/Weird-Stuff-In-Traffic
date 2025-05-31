@@ -16,3 +16,13 @@ export interface Message {
 }
 
 // Add any other types specific to the chat feature here in the future
+// Single generated image
+export interface GeneratedImage {
+  prompt: string;
+  imageBase64: string;
+}
+
+// Response containing multiple generated images
+export interface GeneratedImages {
+  images: GeneratedImage[];
+}

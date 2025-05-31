@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import type { Message, ActiveView } from "../types/chat";
+import type { Message, ActiveView, GeneratedImage, GeneratedImages } from "../types/chat";
 import {
   DialogMessages,
   DialogSequence,
@@ -53,8 +53,7 @@ export function useChatLogic() {
       setTrainingProgress((prev) => Math.min(100, prev + progressIncrement));
 
       console.log(
-        `Finalized Update: Points (${
-          earnedPoints + pointsToAdd // Use argument directly for logging consistency if needed, though state will update
+        `Finalized Update: Points (${earnedPoints + pointsToAdd // Use argument directly for logging consistency if needed, though state will update
         }), Progress (${Math.min(
           100,
           currentProgress + progressIncrement
@@ -168,12 +167,12 @@ export function useChatLogic() {
         prevMessages.map((msg) =>
           msg.id === messageId
             ? {
-                ...msg,
-                isDetecting: false,
-                detectedImageUrl: detectedImage, // Store the detected image URL
-                lastDetectionAccuracy: similarityScore, // Store accuracy
-                lastDetectionPoints: points, // Store points
-              }
+              ...msg,
+              isDetecting: false,
+              detectedImageUrl: detectedImage, // Store the detected image URL
+              lastDetectionAccuracy: similarityScore, // Store accuracy
+              lastDetectionPoints: points, // Store points
+            }
             : msg
         )
       );
@@ -270,18 +269,14 @@ export function useChatLogic() {
         return;
       }
 
-      // Assuming API returns { images: string[] } where strings are base64
-      // TODO: Define a type for the API response
-      const result: { images: string[] } = await response.json();
-      console.log(
-        `Generation API call successful. Received ${result.images.length} images.`
-      );
+      //  Setting result and extracting base64 images
+      const result: GeneratedImages = await response.json();
+      const imageUrls = result.images.map(img => `data:image/png;base64,${img.imageBase64}`);
 
-      // Update the image grid message with actual images and stop loading state
-      setMessages((prevMessages) =>
-        prevMessages.map((msg) =>
+      setMessages(prevMessages =>
+        prevMessages.map(msg =>
           msg.id === loadingImageGridMessage.id
-            ? { ...msg, content: result.images, isLoading: false }
+            ? { ...msg, content: imageUrls, isLoading: false }
             : msg
         )
       );
