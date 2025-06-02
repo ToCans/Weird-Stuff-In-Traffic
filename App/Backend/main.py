@@ -32,9 +32,7 @@ current_directory = os.getcwd()
 path_to_base_directory = re.search(rf"(.*?){"Weird-Stuff-In-Traffic"}", current_directory).group(1)
 
 # Model Paths
-weird_obj_detection_model_path = "Weird-Stuff-In-Traffic/Models/Segmentation-Detection/yolo/coco8_clean/fine_tuned_model/experiment"
 street_detection_model_path = "Weird-Stuff-In-Traffic/App/Backend/models"
-full_weird_obj_detection_model_path = path_to_base_directory + weird_obj_detection_model_path + "/weights/best.pt"
 full_street_detection_detection_model_path = path_to_base_directory + street_detection_model_path + "/streetseg_256_auto.pt"
 
 # Context Manager

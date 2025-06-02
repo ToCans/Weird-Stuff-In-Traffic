@@ -18,7 +18,7 @@ test_metadata.thing_classes = [""]
 # Configuration for Detectron2 Model
 detectron_cfg = get_cfg()
 detectron_cfg.merge_from_file(model_zoo.get_config_file("COCO-Detection/faster_rcnn_X_101_32x8d_FPN_3x.yaml"))
-detectron_cfg.MODEL.WEIGHTS = path_to_base_directory+"/Weird-Stuff-In-Traffic/App/Backend/models/detectron2_best.pth"
+detectron_cfg.MODEL.WEIGHTS = path_to_base_directory+"Weird-Stuff-In-Traffic/App/Backend/models/detectron2_best.pth"
 detectron_cfg.MODEL.DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 detectron_cfg.DATASETS.TEST = ("my_dataset_test", )
 
