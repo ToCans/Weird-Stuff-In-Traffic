@@ -25,8 +25,7 @@ async def generate(req: ImageGenerationPrompt) -> GeneratedImages:
         # Extracting the main nouns from the user's prompt
         states.USER_PROMPT_SUMMARY = extract_nouns_with_counts(req.prompt)
 
-        """
-
+        '''
         # Suitable Reason Detection
         street_image = Image.open("/home/tom/Desktop/Programming/Shared/Weird-Stuff-In-Traffic/Data/images/street-images/0a0a0b1a-7c39d841.jpg").convert("RGB")
 
@@ -76,10 +75,11 @@ async def generate(req: ImageGenerationPrompt) -> GeneratedImages:
         
         
         print(f"\nAll {len(results)} pictures successfully processed ")
-        """
+        '''
 
         # Pretending to generate images
-        directory = "/home/tom/Desktop/Programming/Shared/Weird-Stuff-In-Traffic/Data/yolo/coco8/images/train"
+        directory = "/home/tom/Desktop/Programming/Shared/Weird-Stuff-In-Traffic/Data/images/street-images/sd_generated_test"
+        #directory = "/home/tom/Desktop/Programming/Shared/Weird-Stuff-In-Traffic/Data/images/street-images/sd_generated_test"
         generated_images = []
         for filename in os.listdir(directory):
             if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp', '.gif')):

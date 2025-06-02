@@ -13,8 +13,9 @@ import {
 
 // Define the expected type for the detection API response
 type DetectApiResponse = {
-  similarityScore: number;
-  detectedImage: string; // Add the detected image base64
+  prompt: string; // The prompt used for detection
+  score: number;
+  imageBase64: string; // Add the detected image base64
   // Add other potential fields if the API returns more data
 };
 
@@ -152,9 +153,12 @@ export function useChatLogic() {
       }
 
       const result: DetectApiResponse = await response.json();
-      const similarityScore = result.similarityScore;
-      const detectedImage = result.detectedImage; // Extract detectedImage
+      const similarityScore = result.score;
+      const detectedImage = result.imageBase64; // Extract detectedImage
+
+      /* Backend will handle the points calculations */
       const points = calculateUserScore(similarityScore);
+
 
       console.log(
         "Detection API call successful. Score:",

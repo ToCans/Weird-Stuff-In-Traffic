@@ -1,10 +1,18 @@
 import { NextResponse } from "next/server";
 
-// Helper function to introduce delay
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+const backendUrl = process.env.BACKEND_API_BASE_URL || "http://127.0.0.1:8000";
 
 export async function POST(request: Request) {
+  if (!backendUrl) {
+    console.error("BACKEND_API_BASE_URL environment variable is not set.");
+    return NextResponse.json(
+      { message: "Backend API URL is not configured." },
+      { status: 500 }
+    );
+  }
+
   try {
+    // Get the prompt and imageBase64 from the incoming request
     const { prompt, imageBase64 } = await request.json();
 
     // Basic validation
@@ -15,32 +23,49 @@ export async function POST(request: Request) {
       );
     }
 
-    console.log("Received prompt for detection:", prompt);
-    // console.log("Received imageBase64 for detection:", imageBase64.substring(0, 50) + "..."); // Log truncated base64
+    // Forward the request to the actual backend API
+    const backendResponse = await fetch(`${backendUrl}/detect`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        // Forward any other necessary headers if needed
+      },
+      body: JSON.stringify({ prompt, imageBase64 }), // Send both prompt and image
+    });
 
-    console.log("Simulating detection delay..."); // Log delay start
-    await delay(7000); // Add delay for the detection
-    console.log("Detection delay finished."); // Log delay end
+    console.log("Backend Response", backendResponse)
 
-    // Simulate detection processing
-    // Generate a random similarity score between 0 and 100
-    const similarityScore = Math.floor(Math.random() * 101);
-
-    console.log("Simulated detection score:", similarityScore);
-
-    // Return the similarity score and the original image base64
-    return NextResponse.json({ similarityScore, detectedImage: imageBase64 });
-  } catch (error) {
-    console.error("Error in detect API:", error);
-    if (error instanceof SyntaxError) {
-      // Handle JSON parsing error
+    // Check if the backend request was successful
+    if (!backendResponse.ok) {
+      const errorData = await backendResponse.text();
+      console.error(
+        `Backend API /detect error: ${backendResponse.status}`,
+        errorData
+      );
       return NextResponse.json(
-        { message: "Invalid JSON body" },
-        { status: 400 }
+        { message: `Backend error: ${errorData}` },
+        { status: backendResponse.status }
+      );
+    }
+
+    // Get the response data (assuming it's JSON with { similarityScore: ... })
+    const data = await backendResponse.json();
+
+    // Return the response from the backend to the frontend
+    return NextResponse.json(data);
+  } catch (error) {
+    console.error("Error forwarding request to /detect backend:", error);
+    // Handle potential network errors or JSON parsing errors
+    if (error instanceof SyntaxError) {
+      return NextResponse.json(
+        {
+          message: "Invalid JSON received from backend or invalid request body",
+        },
+        { status: 500 }
       );
     }
     return NextResponse.json(
-      { message: "Internal Server Error" },
+      { message: "Internal Server Error while contacting backend" },
       { status: 500 }
     );
   }

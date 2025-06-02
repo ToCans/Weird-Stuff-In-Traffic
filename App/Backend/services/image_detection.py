@@ -7,13 +7,16 @@ import re
 import os
 import datetime
 import uuid
+import ast
 
 # Third-party
-import cv2  # Ensure opencv-python is installed: pip install opencv-python
-import numpy as np
+import cv2
+from detectron2.utils.visualizer import Visualizer, ColorMode
+from detectron2.data import MetadataCatalog
 
 # Local application
 from schemas.images import DetectionRequest, DetectionResponse
+from models.configurations import test_metadata
 from services import states
 from services.image_summary import preprocess, generate_response
 from services.image_utils import base64_to_image
@@ -30,26 +33,26 @@ async def detect(req: DetectionRequest) -> DetectionResponse:
         # Decode base64 input to NumPy image array
         detect_image = base64_to_image(req.imageBase64)
 
-        # Run YOLO prediction
+        # Run Detectron2 Prediction
         print("Running Prediction")
-        detection_results = states.WEIRD_DETECTION_MODEL.predict(detect_image)
-        result = detection_results[0]
-        boxes = result.boxes
+        outputs = states.WEIRD_DETECTION_MODEL(detect_image)
 
-        # Check for empty detection
+        print("Prediction Outputs:", outputs)
+
+        instances = outputs["instances"].to("cpu")
+        boxes = instances.pred_boxes if instances.has("pred_boxes") else None
+
         if boxes is None or len(boxes) == 0:
             print("No objects detected. Saving image.")
-
-            # Convert RGB to BGR
             image_bgr = cv2.cvtColor(detect_image, cv2.COLOR_RGB2BGR)
 
-            # Create a unique filename
             current_directory = os.getcwd()
-            path_to_base_directory = re.search(rf"(.*?){"Weird-Stuff-In-Traffic"}", current_directory).group(1)
-            filename = f"no_detection_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:8]}.jpeg"
-            save_path = os.path.join(f"{path_to_base_directory}/App/Backend/failed_images", filename)
+            match = re.search(rf"(.*?){'Weird-Stuff-In-Traffic'}", current_directory)
+            path_to_base_directory = match.group(1) if match else current_directory
 
-            # Ensure directory exists
+            filename = f"no_detection_{datetime.datetime.utcnow().strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:8]}.jpeg"
+            save_path = os.path.join(path_to_base_directory, "Weird-Stuff-In-Traffic/App/Backend/failed_images", filename)
+
             os.makedirs(os.path.dirname(save_path), exist_ok=True)
             cv2.imwrite(save_path, image_bgr)
 
@@ -59,36 +62,41 @@ async def detect(req: DetectionRequest) -> DetectionResponse:
                 score=1.0
             )
 
-        # Format the annotated image
-        annotated_image = np.array(result.plot())
-        img_np = detect_image
-        cropped_image = None
+        # Annotate image
+        v = Visualizer(
+            detect_image[:, :, ::-1],  # Convert RGB to BGR for Detectron2
+            metadata=test_metadata,   # should contain .thing_classes
+            scale=1.0,
+            instance_mode=ColorMode.IMAGE
+        )
+        out = v.draw_instance_predictions(outputs["instances"].to("cpu"))
+        annotated_image = out.get_image()[:, :, ::-1]  # Convert back to RGB
+
+        # Extract boxes
+        boxes = outputs["instances"].pred_boxes if outputs["instances"].has("pred_boxes") else []
 
         # Crop the first detected object
-        for i, box in enumerate(boxes.xyxy):
-            x1, y1, x2, y2 = map(int, box[:4])
-            cropped_image = img_np[y1:y2, x1:x2]
-            break  # Only use the first object for description
+        cropped_image = detect_image
+        if len(boxes) > 0:
+            x1, y1, x2, y2 = map(int, boxes.tensor[0])
+            cropped_image = detect_image[y1:y2, x1:x2]
 
-        if cropped_image is None:
-            cropped_image = detect_image
-
-        # Convert annotated image to base64
+        # Encode annotated image to base64 JPEG
         annotated_image_bgr = cv2.cvtColor(annotated_image, cv2.COLOR_RGB2BGR)
         success, buffer = cv2.imencode('.jpeg', annotated_image_bgr)
         if not success:
             raise ValueError("Failed to encode image.")
 
         encoded_image = base64.b64encode(buffer).decode('utf-8')
+        image_base64_with_header = f"data:image/jpeg;base64,{encoded_image}"
 
-        # Preprocess and generate description
+        # Prompt preprocessing and generation (unchanged)
         processed_prompt = preprocess(
             instruction="Please create a list of objects in this image.",
             image_np=cropped_image,
             processor=states.DETECTION_DESCRIPTION_PROCESSOR
         )
 
-        # Generated a Summary
         detection_summary = generate_response(
             processed_prompt,
             states.DETECTION_DESCRIPTION_MODEL,
@@ -96,9 +104,30 @@ async def detect(req: DetectionRequest) -> DetectionResponse:
             device=states.DEVICE
         )
 
-        # Returning detection with final score
+        eval_detection_summary = ast.literal_eval(detection_summary)
+
+        # Normalize to lowercase
+        user_requested_set = set(item.lower() for item in  states.USER_PROMPT_SUMMARY)
+        predicted_set = set(item.lower() for item in eval_detection_summary)
+
+        print("User Requested Set:", user_requested_set)
+        print("Predicted Set:", predicted_set)
+
+        # Compare
+        matches = user_requested_set & predicted_set
+        recall = len(matches) / len(user_requested_set) if user_requested_set else 0.0
+
+        if isinstance(eval_detection_summary, list):
+            # 0.5 for getting a detection right
+            score = round((1.0 - recall) * 100, 2)
+        else:
+            score = 0.0
+
+        print("Score:", score)
+        print("Recall:", recall)
+
         return DetectionResponse(
             prompt=req.prompt,
-            imageBase64=encoded_image,
-            score=float(1 / len(detection_summary)) if detection_summary else 0.0
+            imageBase64=image_base64_with_header,
+            score=score
         )
