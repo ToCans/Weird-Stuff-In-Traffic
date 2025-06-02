@@ -17,7 +17,7 @@ import time
 
 
 test_metadata = MetadataCatalog.get("my_dataset_test")
-test_metadata.thing_classes = ["weird_object"]  # Since you have NUM_CLASSES = 1
+test_metadata.thing_classes = ["weird_object"] 
 
 # Configuration
 cfg = get_cfg()
