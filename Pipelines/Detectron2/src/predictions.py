@@ -18,8 +18,8 @@ import time
 
 # Register dataset
 register_coco_instances("my_dataset_test", {}, 
-                      "/home/danielshaquille/Daniel/projects/datasets/weird_stuff_coco/coco_test.json",
-                      "/home/danielshaquille/Daniel/projects/datasets/weird_stuff_coco/test")
+                      "/home/danielshaquille/Daniel/projects/datasets/weird_stuff_in_traffic/resized_images/test.json",
+                      "/home/danielshaquille/Daniel/projects/datasets/weird_stuff_in_traffic/resized_images/test")
 test_metadata = MetadataCatalog.get("my_dataset_test")
 test_metadata.thing_classes = ["weird_object"]  # Since you have NUM_CLASSES = 1
 
@@ -27,24 +27,32 @@ test_metadata.thing_classes = ["weird_object"]  # Since you have NUM_CLASSES = 1
 cfg = get_cfg()
 cfg.merge_from_file(model_zoo.get_config_file("COCO-Detection/faster_rcnn_X_101_32x8d_FPN_3x.yaml"))
 cfg.MODEL.DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
-cfg.MODEL.WEIGHTS = "/home/danielshaquille/Daniel/projects/code/weird_stuff_in_traffic/output/model_0009999.pth"
+cfg.MODEL.WEIGHTS = "/home/danielshaquille/Daniel/projects/code/weird_stuff_in_traffic_local/output/20250526_ws_best_model.pth"
 cfg.DATASETS.TEST = ("my_dataset_test", )
-cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.85
+
+cfg.MODEL.ANCHOR_GENERATOR.SIZES = [[8, 16, 32, 64, 128, 256]]  # Removed 512 for better small object detection
+cfg.MODEL.ANCHOR_GENERATOR.ASPECT_RATIOS = [[0.25, 0.5, 1.0, 2.0, 4.0]]  # Wider range for small objects
+# ROI Head Adjustments for Small Objects
+cfg.MODEL.ROI_BOX_HEAD.POOLER_RESOLUTION = 14  # Increased from default 7
+cfg.MODEL.ROI_BOX_HEAD.POOLER_SAMPLING_RATIO = 2  # Increased from default 0
+cfg.MODEL.RPN.HEAD_NAME = "StandardRPNHead"
+
+cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.97
 cfg.MODEL.ROI_HEADS.NUM_CLASSES = 1
 predictor = DefaultPredictor(cfg)
 
 # Image settings
 TARGET_WIDTH = 640
 TARGET_HEIGHT = 640
-OUTPUT_DIR = "/home/danielshaquille/Daniel/projects/code/weird_stuff_in_traffic/predictions"
+OUTPUT_DIR = "/home/danielshaquille/Daniel/projects/code/weird_stuff_in_traffic_local/predictions"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # Get images
-all_images = glob.glob('/home/danielshaquille/Daniel/projects/datasets/weird_stuff_coco/test/*jpg')
+all_images = glob.glob('/home/danielshaquille/Daniel/projects/datasets/weird_stuff_in_traffic/coco_datasets/test/*jpg')
 
 # Select random images
 random.seed(20)
-selected_images = random.sample(all_images, min(5, len(all_images)))
+selected_images = random.sample(all_images, min(20, len(all_images)))
 
 # For timing (in milliseconds)
 inference_times_ms = []
