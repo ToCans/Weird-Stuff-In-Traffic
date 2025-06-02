@@ -13,7 +13,7 @@ from PIL import Image
 from schemas.images import ImageGenerationPrompt, GeneratedImages
 from services import states
 from services.prompt_summary import extract_nouns_with_counts
-from services.image_inpainting import get_suitable_region, get_random_bbox_within_bbox, inpaint_image
+from services.image_inpainting import get_suitable_region, get_random_bbox_within_bbox, realvisxl_inpaint
 
 async def generate(req: ImageGenerationPrompt) -> GeneratedImages:
     """Function used for generating weird images."""
@@ -41,24 +41,26 @@ async def generate(req: ImageGenerationPrompt) -> GeneratedImages:
         street_image, suitable_inpaint_region_bbox, height_diff = get_suitable_region(polygons_results, street_image)
 
         results = []
-        strength = 0.6
+
+        strengths = [0.5,  0.55,  0.55,  0.6]
+        g_scales =  [11.0,  11,  6,  4]
 
         for i in range(4):
             # get random fitting bbox for inpainting
             inpaint_bbox = get_random_bbox_within_bbox(
                         bbox=suitable_inpaint_region_bbox, 
-                        min_width=street_image.width*0.4, 
-                        max_width=street_image.width*0.7, 
-                        min_height=street_image.height*0.4, 
-                        max_height=street_image.height*0.7,
+                        min_width=street_image.width*0.5, 
+                        max_width=street_image.width*0.9, 
+                        min_height=street_image.height*0.5, 
+                        max_height=street_image.height*0.9,
                         height_diff=height_diff,
                         image_size=street_image.size
                 )
 
             # Inpainting the image
             print("Attempting Inpainting")
-            inpainted_image = inpaint_image(street_image.copy(), inpaint_bbox, req.prompt, strength)
-            strength = max(1, strength + 0.1)
+            inpainted_image = realvisxl_inpaint(street_image.copy(), inpaint_bbox, req.prompt, strengths[i], g_scales[i])
+            
             buffered = BytesIO()
             inpainted_image.save(buffered, format="PNG")
             inpainted_image_base64 = base64.b64encode(buffered.getvalue()).decode("utf-8")

@@ -10,7 +10,7 @@ from fastapi import FastAPI
 
 # AI Related Imports
 from ultralytics import YOLO
-from diffusers import StableDiffusionXLInpaintPipeline, DPMSolverMultistepScheduler
+from diffusers import StableDiffusionXLInpaintPipeline, DPMSolverMultistepScheduler, DPMSolverSDEScheduler
 import transformers
 import torch
 
@@ -40,8 +40,9 @@ async def lifespan(_):
     print("Loading models...")
     states.DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     states.BACKEND_LOCK = asyncio.Lock()
-    states.GENERATION_MODEL = StableDiffusionXLInpaintPipeline.from_pretrained("stabilityai/stable-diffusion-xl-base-1.0",torch_dtype=torch.float16, variant="fp16", safety_checker=None).to(states.DEVICE)
-    states.GENERATION_MODEL.scheduler = DPMSolverMultistepScheduler.from_config(states.GENERATION_MODEL.scheduler.config)
+    states.GENERATION_MODEL = StableDiffusionXLInpaintPipeline.from_pretrained("SG161222/RealVisXL_V5.0",torch_dtype=torch.float16, variant="fp16", safety_checker=None).to(states.DEVICE)
+    # states.GENERATION_MODEL.scheduler = DPMSolverMultistepScheduler.from_config(states.GENERATION_MODEL.scheduler.config)
+    states.GENERATION_MODEL.scheduler = DPMSolverSDEScheduler.from_config(states.GENERATION_MODEL.scheduler.config, use_karras_sigmas=True)
     states.WEIRD_DETECTION_MODEL = YOLO(full_weird_obj_detection_model_path).to(states.DEVICE)
     states.STREET_DETECTION_MODEL = YOLO(full_street_detection_detection_model_path).to(states.DEVICE)
     states.DETECTION_DESCRIPTION_PROCESSOR = transformers.Qwen2VLProcessor.from_pretrained("Qwen/Qwen2-VL-2B-Instruct", use_fast=True)
