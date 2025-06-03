@@ -50,6 +50,9 @@ async def generate(req: ImageGenerationPrompt) -> GeneratedImages:
         strength = 0.5
 
         for i in range(4):
+            # Clamp the strength
+            strength = max(0.0, min(strength, 1.0))
+
             # get random fitting bbox for inpainting
             inpaint_bbox = get_random_bbox_within_bbox(
                         bbox=suitable_inpaint_region_bbox,
@@ -64,13 +67,15 @@ async def generate(req: ImageGenerationPrompt) -> GeneratedImages:
             # Inpainting the image
             print("Attempting Inpainting")
             inpainted_image = inpaint_image(street_image.copy(), inpaint_bbox, req.prompt, strength)
-            strength = max(1, strength + 0.1)
             buffered = BytesIO()
             inpainted_image.save(buffered, format="PNG")
 
             # Encoding and Creating GeneratedImage object
             inpainted_image_base64 = base64.b64encode(buffered.getvalue()).decode("utf-8")
             generated_images.append(GeneratedImage(prompt=req.prompt,imageBase64=inpainted_image_base64))
+
+            # Strength Increase
+            strength += 0.1
 
         print(f"\nAll {len(generated_images)} pictures successfully processed ")
 
