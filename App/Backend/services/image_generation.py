@@ -5,6 +5,7 @@ import asyncio
 from io import BytesIO
 import base64
 import os
+import random
 
 # Third-party
 from PIL import Image
@@ -25,31 +26,36 @@ async def generate(req: ImageGenerationPrompt) -> GeneratedImages:
         # Extracting the main nouns from the user's prompt
         states.USER_PROMPT_SUMMARY = extract_nouns_with_counts(req.prompt)
 
-        '''
-        # Suitable Reason Detection
-        street_image = Image.open("/home/tom/Desktop/Programming/Shared/Weird-Stuff-In-Traffic/Data/images/street-images/0a0a0b1a-7c39d841.jpg").convert("RGB")
+        # Randomly select street image from dataset
+        street_image_folder_path = "/home/ai-team2/Weird-Stuff-In-Traffic/Data/yolo/nuScenes/images/train"
+        all_street_image_paths = [
+            os.path.join(street_image_folder_path, f)
+            for f in os.listdir(street_image_folder_path)
+            if f.lower().endswith((".png", ".jpg", ".jpeg"))
+        ]
+        image_path = random.choice(all_street_image_paths)
+        street_image = Image.open(image_path).convert("RGB")
 
-        print("Predicting Street Polygons")
+        # Gathering Suitable Region for Inpainting
         polygons_results = states.STREET_DETECTION_MODEL.predict(
             source=street_image,
             task='segment',
             verbose=False,
             conf=0.25
         )
-
-        
         street_image, suitable_inpaint_region_bbox, height_diff = get_suitable_region(polygons_results, street_image)
 
-        results = []
+        # Generation of images
+        generated_images = []
         strength = 0.6
 
         for i in range(4):
             # get random fitting bbox for inpainting
             inpaint_bbox = get_random_bbox_within_bbox(
-                        bbox=suitable_inpaint_region_bbox, 
-                        min_width=street_image.width*0.4, 
-                        max_width=street_image.width*0.7, 
-                        min_height=street_image.height*0.4, 
+                        bbox=suitable_inpaint_region_bbox,
+                        min_width=street_image.width*0.4,
+                        max_width=street_image.width*0.7,
+                        min_height=street_image.height*0.4,
                         max_height=street_image.height*0.7,
                         height_diff=height_diff,
                         image_size=street_image.size
@@ -61,33 +67,11 @@ async def generate(req: ImageGenerationPrompt) -> GeneratedImages:
             strength = max(1, strength + 0.1)
             buffered = BytesIO()
             inpainted_image.save(buffered, format="PNG")
+
+            # Encoding and Creating GeneratedImage object
             inpainted_image_base64 = base64.b64encode(buffered.getvalue()).decode("utf-8")
+            generated_images.append(GeneratedImage(prompt=req.prompt,imageBase64=inpainted_image_base64))
 
-            results.append({
-                "image_number": i + 1, 
-                "prompt": req.prompt,
-                "prompt subjects": states.USER_PROMPT_SUMMARY, 
-                "inpaint_bbox_xyxy": list(inpaint_bbox),
-                "inpainted_image": inpainted_image_base64
-            })
-            print(f"Picture {i + 1} successfully processed")
+        print(f"\nAll {len(generated_images)} pictures successfully processed ")
 
-        
-        
-        print(f"\nAll {len(results)} pictures successfully processed ")
-        '''
-
-        # Pretending to generate images
-        directory = "/home/tom/Desktop/Programming/Shared/Weird-Stuff-In-Traffic/Data/images/street-images/sd_generated_test"
-        #directory = "/home/tom/Desktop/Programming/Shared/Weird-Stuff-In-Traffic/Data/images/street-images/sd_generated_test"
-        generated_images = []
-        for filename in os.listdir(directory):
-            if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp', '.gif')):
-                image_path = os.path.join(directory, filename)
-                with Image.open(image_path) as img:
-                    buffered = BytesIO()
-                    img.save(buffered, format="PNG")
-                    img_base64 = base64.b64encode(buffered.getvalue()).decode("utf-8")
-                    generated_images.append(GeneratedImage(prompt=req.prompt, imageBase64=img_base64))
         return GeneratedImages(images=generated_images)
-
