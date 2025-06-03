@@ -47,7 +47,7 @@ async def generate(req: ImageGenerationPrompt) -> GeneratedImages:
 
         # Generation of images
         generated_images = []
-        strength = 0.6
+        strength = 0.5
 
         for i in range(4):
             # get random fitting bbox for inpainting
