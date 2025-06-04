@@ -16,6 +16,7 @@ import { useChatLogic } from "@/app/hooks/useChatLogic";
 import { Modal } from "@/app/components/modals/ShareModal_1";
 import { ShareModal2 } from "@/app/components/modals/ShareModal_2";
 import dynamic from "next/dynamic";
+import CarAnimation from "@/app/components/game/CarAnimation";
 
 // Dynamically import TutorialTour with SSR disabled
 const TutorialTour = dynamic(
@@ -36,6 +37,7 @@ export default function ChatPage() {
     resetDetectionCount,
     signalModalOpen,
     resetSignalModalOpen,
+    carAnimationState,
     setPrompt,
     handleGenerate,
     handleImageSelect,
@@ -43,6 +45,7 @@ export default function ChatPage() {
     handleEditMessage,
     handleSwitchView,
     finalizeScoreUpdate,
+    handleTypeAnimationComplete,
   } = useChatLogic();
 
   const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -94,9 +97,6 @@ export default function ChatPage() {
       )}%\nYou've earned ${result.points} points!`;
       sequenceItems.push(scoreMessage);
       sequenceItems.push(() => {
-        console.log(
-          `TypeAnimation: Calling finalizeScoreUpdate with detectionCount: ${detectionCount}`
-        );
         finalizeScoreUpdate(result.points, result.score, detectionCount);
       });
     } else if (typeof dialogSequence.expanded === "string") {
@@ -105,9 +105,26 @@ export default function ChatPage() {
         sequenceItems.push(dialogSequence.expanded);
       }
     }
+    if (
+      !(
+        typeof dialogSequence.expanded === "object" &&
+        dialogSequence.expanded?.type === "detectionResult"
+      )
+    ) {
+      sequenceItems.push(() => {
+        if (handleTypeAnimationComplete) {
+          handleTypeAnimationComplete();
+        }
+      });
+    }
 
     return sequenceItems;
-  }, [dialogSequence, finalizeScoreUpdate, detectionCount]);
+  }, [
+    dialogSequence,
+    finalizeScoreUpdate,
+    detectionCount,
+    handleTypeAnimationComplete,
+  ]);
 
   useEffect(() => {
     if (activeView === "chat" && chatContainerRef.current) {
@@ -125,8 +142,6 @@ export default function ChatPage() {
 
   const handleOpenShareModal2 = useCallback((imageUrl: string) => {
     setSharedImageUrlForModal2(imageUrl);
-    // TODO: Get relevant accuracy and points for this specific image
-    // For now, these are placeholders or could use global state if appropriate
     setIsShareModal2Open(true);
   }, []);
 
@@ -163,6 +178,9 @@ export default function ChatPage() {
                     1000,
                     dialogSequence.expanded.baseMessageExpanded,
                     () => {
+                      if (handleTypeAnimationComplete) {
+                        handleTypeAnimationComplete();
+                      }
                       const detectionResult =
                         dialogSequence.expanded as DetectionResultPayload;
                       finalizeScoreUpdate(
@@ -177,7 +195,7 @@ export default function ChatPage() {
                   style={{ whiteSpace: "pre-line", display: "inline-block" }}
                   repeat={0}
                   cursor={true}
-                  key={JSON.stringify(dialogSequence)}
+                  key={JSON.stringify(dialogSequence) + "-detection"}
                 />
               ) : (
                 <TypeAnimation
@@ -187,24 +205,15 @@ export default function ChatPage() {
                   style={{ whiteSpace: "pre-line", display: "inline-block" }}
                   repeat={0}
                   cursor={true}
-                  key={JSON.stringify(dialogSequence)}
+                  key={JSON.stringify(dialogSequence) + "-normal"}
                 />
               )}
             </Dialog>
           </div>
           {/* Car image */}
-          <div className="relative w-40 h-40 md:w-60 md:h-60 self-center md:self-start md:ml-10 animate-slide-left-fade-in mb-4 md:mb-0">
-            {" "}
-            <Image
-              src="/car_1.png"
-              alt="Weird Car"
-              fill
-              className="object-contain"
-              priority
-            />
-          </div>
+          <CarAnimation animationState={carAnimationState} />
         </div>
-        {/* Sütun 2 & 3: Chat Area and Prompt Input */}
+        {/* Column 2 & 3: Chat Area and Prompt Input */}
         <div className="w-full md:w-2/3 flex flex-col justify-between p-4 md:p-6 md:mr-10 md:mt-3 order-1 md:order-2">
           {/* Content Area: Conditionally render Chat or Game */}
           <div
