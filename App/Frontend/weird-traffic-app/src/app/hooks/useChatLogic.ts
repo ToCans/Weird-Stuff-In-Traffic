@@ -1,5 +1,10 @@
-import { useState, useCallback } from "react";
-import type { Message, ActiveView, GeneratedImage, GeneratedImages } from "../types/chat";
+import { useState, useCallback, useEffect } from "react";
+import type {
+  Message,
+  ActiveView,
+  GeneratedImage,
+  GeneratedImages,
+} from "../types/chat";
 import {
   DialogMessages,
   DialogSequence,
@@ -18,6 +23,13 @@ type DetectApiResponse = {
   imageBase64: string; // Add the detected image base64
   // Add other potential fields if the API returns more data
 };
+export type CarAnimationState =
+  | "speaking"
+  | "waiting"
+  | "laughing"
+  | "sad"
+  | "scan"
+  | "idle";
 
 export function useChatLogic() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -32,6 +44,8 @@ export function useChatLogic() {
   const [trainingProgress, setTrainingProgress] = useState<number>(0); // Consider if this state belongs here or at a higher level
   const [detectionCount, setDetectionCount] = useState<number>(0); // Add detectionCount
   const [signalModalOpen, setSignalModalOpen] = useState<boolean>(false); // New state to signal modal opening
+  const [carAnimationState, setCarAnimationState] =
+    useState<CarAnimationState>("idle"); // Initial state is 'idle'
 
   // Function to reset the signal
   const resetSignalModalOpen = useCallback(() => {
@@ -54,7 +68,8 @@ export function useChatLogic() {
       setTrainingProgress((prev) => Math.min(100, prev + progressIncrement));
 
       console.log(
-        `Finalized Update: Points (${earnedPoints + pointsToAdd // Use argument directly for logging consistency if needed, though state will update
+        `Finalized Update: Points (${
+          earnedPoints + pointsToAdd // Use argument directly for logging consistency if needed, though state will update
         }), Progress (${Math.min(
           100,
           currentProgress + progressIncrement
@@ -66,16 +81,14 @@ export function useChatLogic() {
         console.log(
           `FinalizeUpdate: Condition met (currentDetectionCount: ${currentDetectionCount} >= 5). Signaling modal open.`
         );
-        setSignalModalOpen(true); // Signal modal open AFTER state updates
+        setSignalModalOpen(true);
       } else {
         console.log(
           `FinalizeUpdate: Condition NOT met (currentDetectionCount: ${currentDetectionCount} < 5). Not signaling.`
         );
       }
     },
-    [trainingProgress, earnedPoints] // Remove detectionCount from dependencies, add earnedPoints for correct logging calculation
-    // Note: Consider if earnedPoints is truly needed if you just rely on the argument pointsToAdd for logic.
-    // Added earnedPoints just to ensure the console.log calculation is potentially more accurate reflecting the state just before the update completes.
+    [trainingProgress, earnedPoints]
   );
 
   // Function to reset the detection counter
@@ -120,6 +133,7 @@ export function useChatLogic() {
     );
 
     setDialogSequence(DialogMessages.imageSelected);
+    setCarAnimationState("scan");
 
     try {
       console.log(
@@ -143,12 +157,12 @@ export function useChatLogic() {
       if (!response.ok) {
         const errorData = await response.text();
         console.error("Detection API call failed:", response.status, errorData);
-        setDialogSequence(DialogMessages.error);
         setMessages((prevMessages) =>
           prevMessages.map((msg) =>
             msg.id === messageId ? { ...msg, isDetecting: false } : msg
           )
         );
+        setDialogSequence(DialogMessages.error);
         return;
       }
 
@@ -159,7 +173,6 @@ export function useChatLogic() {
       /* Backend will handle the points calculations */
       const points = calculateUserScore(similarityScore);
 
-
       console.log(
         "Detection API call successful. Score:",
         similarityScore,
@@ -167,16 +180,24 @@ export function useChatLogic() {
         points
       );
 
+      if (similarityScore >= 0 && similarityScore < 50) {
+        setCarAnimationState("laughing");
+      } else if (similarityScore >= 50 && similarityScore <= 100) {
+        setCarAnimationState("sad");
+      } else {
+        setCarAnimationState("speaking");
+      }
+
       setMessages((prevMessages) =>
         prevMessages.map((msg) =>
           msg.id === messageId
             ? {
-              ...msg,
-              isDetecting: false,
-              detectedImageUrl: detectedImage, // Store the detected image URL
-              lastDetectionAccuracy: similarityScore, // Store accuracy
-              lastDetectionPoints: points, // Store points
-            }
+                ...msg,
+                isDetecting: false,
+                detectedImageUrl: detectedImage, // Store the detected image URL
+                lastDetectionAccuracy: similarityScore, // Store accuracy
+                lastDetectionPoints: points, // Store points
+              }
             : msg
         )
       );
@@ -205,12 +226,12 @@ export function useChatLogic() {
       }
     } catch (error) {
       console.error("Error calling detection API:", error);
-      setDialogSequence(DialogMessages.error);
       setMessages((prevMessages) =>
         prevMessages.map((msg) =>
           msg.id === messageId ? { ...msg, isDetecting: false } : msg
         )
       );
+      setDialogSequence(DialogMessages.error);
     }
   };
 
@@ -219,6 +240,7 @@ export function useChatLogic() {
     if (!prompt.trim() || isLoadingGeneration) return;
 
     setIsLoadingGeneration(true); // Set loading true at the beginning
+    setCarAnimationState("waiting");
 
     if (activeView !== "chat") {
       setActiveView("chat");
@@ -226,7 +248,7 @@ export function useChatLogic() {
     setDialogSequence(DialogMessages.loading);
 
     const newUserMessage: Message = {
-      id: Date.now(), // Consider a more robust ID generation? UUID?
+      id: Date.now(),
       type: "user",
       content: prompt,
     };
@@ -238,18 +260,16 @@ export function useChatLogic() {
 
     // Add placeholder for image grid while loading
     const loadingImageGridMessage: Message = {
-      id: Date.now() + 1, // Ensure unique ID
+      id: Date.now() + 1,
       type: "image_grid",
-      content: [], // Initially empty
+      content: [],
       isLoading: true,
     };
     setMessages((prevMessages) => [...prevMessages, loadingImageGridMessage]);
 
     try {
       console.log("Calling generation API for prompt:", currentPrompt);
-      // Replace fetch with a dedicated API call function eventually?
       const response = await fetch("/api/generate", {
-        // Consider moving API endpoint to constants
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -264,21 +284,24 @@ export function useChatLogic() {
           response.status,
           errorData
         );
-        setDialogSequence(DialogMessages.error);
+
         // Remove the loading image grid message on error
         setMessages((prevMessages) =>
           prevMessages.filter((msg) => msg.id !== loadingImageGridMessage.id)
         );
-        setIsLoadingGeneration(false); // Set loading false on error
+        setDialogSequence(DialogMessages.error);
+        setIsLoadingGeneration(false);
         return;
       }
 
       //  Setting result and extracting base64 images
       const result: GeneratedImages = await response.json();
-      const imageUrls = result.images.map(img => `data:image/png;base64,${img.imageBase64}`);
+      const imageUrls = result.images.map(
+        (img) => `data:image/png;base64,${img.imageBase64}`
+      );
 
-      setMessages(prevMessages =>
-        prevMessages.map(msg =>
+      setMessages((prevMessages) =>
+        prevMessages.map((msg) =>
           msg.id === loadingImageGridMessage.id
             ? { ...msg, content: imageUrls, isLoading: false }
             : msg
@@ -289,15 +312,81 @@ export function useChatLogic() {
       setDialogSequence(DialogMessages.completed);
     } catch (error) {
       console.error("Error calling generation API:", error);
-      setDialogSequence(DialogMessages.error);
-      // Remove the loading image grid message on error
       setMessages((prevMessages) =>
         prevMessages.filter((msg) => msg.id !== loadingImageGridMessage.id)
       );
+      setDialogSequence(DialogMessages.error);
     } finally {
-      setIsLoadingGeneration(false); // Ensure loading is set to false in all cases
+      setIsLoadingGeneration(false);
     }
   };
+
+  const handleTypeAnimationComplete = useCallback(() => {
+    setCarAnimationState((currentState) => {
+      // States that should transition to 'idle' after their associated TypeAnimation completes
+      const statesToIdleAfterTyping = [
+        "speaking",
+        "laughing",
+        "sad",
+        "waiting",
+      ];
+      if (statesToIdleAfterTyping.includes(currentState)) {
+        console.log(
+          `TypeAnimation complete, car state changing from "${currentState}" to "idle".`
+        );
+        return "idle";
+      }
+      console.log(
+        `TypeAnimation complete, car state is "${currentState}", not changing to "idle" based on this rule.`
+      );
+      return currentState;
+    });
+  }, []);
+
+  useEffect(() => {
+    console.log(
+      `Car Animation useEffect triggered. Dialog: ${dialogSequence.initial}, Current Car State: ${carAnimationState}`
+    );
+
+    const isApiInProgress =
+      carAnimationState === "waiting" || carAnimationState === "scan";
+    if (isApiInProgress) {
+      console.log(
+        "Car Animation: API call in progress, state will not be changed by this effect."
+      );
+      return;
+    }
+
+    const isDetectionResultDialog =
+      typeof dialogSequence.expanded === "object" &&
+      dialogSequence.expanded.type === "detectionResult";
+
+    if (isDetectionResultDialog) {
+      if (
+        carAnimationState === "laughing" ||
+        carAnimationState === "sad" ||
+        carAnimationState === "speaking"
+      ) {
+        console.log(
+          `Car Animation: Dialog is for detection result, car is appropriately '${carAnimationState}'. State preserved by useEffect.`
+        );
+        return;
+      }
+    }
+    if (
+      carAnimationState === "idle" ||
+      (carAnimationState !== "laughing" && carAnimationState !== "sad")
+    ) {
+      console.log(
+        `Car Animation: Setting car to 'speaking'. Current state: '${carAnimationState}', Dialog: '${dialogSequence.initial}'`
+      );
+      setCarAnimationState("speaking");
+    } else {
+      console.log(
+        `Car Animation: Car is '${carAnimationState}', not changing to 'speaking' for dialog '${dialogSequence.initial}'.`
+      );
+    }
+  }, [dialogSequence]); // Only dependent on dialogSequence.
 
   // Placeholder functions - Implement or remove if not needed by the hook
   // If they only interact with UI state not managed here, keep them in the component
@@ -362,6 +451,7 @@ export function useChatLogic() {
     trainingProgress,
     detectionCount,
     signalModalOpen,
+    carAnimationState,
     setPrompt,
     handleGenerate,
     handleImageSelect,
@@ -371,5 +461,6 @@ export function useChatLogic() {
     finalizeScoreUpdate,
     resetDetectionCount,
     resetSignalModalOpen,
+    handleTypeAnimationComplete,
   };
 }
