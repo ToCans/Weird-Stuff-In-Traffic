@@ -117,11 +117,15 @@ async def detect(req: DetectionRequest) -> DetectionResponse:
         matches = user_requested_set & predicted_set
         recall = len(matches) / len(user_requested_set) if user_requested_set else 0.0
 
+        # Scoring
         if isinstance(eval_detection_summary, list):
+            if recall != 0.0:
             # 0.5 for getting a detection right
-            score = round((1.0 - recall) * 100, 2)
+                score = 50.0 + round((0.5 - recall) * 100, 2)
+            else:
+                score = 50.0
         else:
-            score = 0.0
+            score = 100.0
 
         print("Score:", score)
         print("Recall:", recall)
