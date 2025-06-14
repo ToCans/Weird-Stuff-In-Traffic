@@ -59,7 +59,7 @@ async def detect(req: DetectionRequest) -> DetectionResponse:
             return DetectionResponse(
                 prompt=req.prompt,
                 imageBase64=req.imageBase64,
-                score=100.0
+                score=0.0
             )
 
         # Annotate image
@@ -116,11 +116,11 @@ async def detect(req: DetectionRequest) -> DetectionResponse:
         # Scoring
         if boxes:
             if recall != 0.0:
-                score = 50.0 - round(50 * recall, 2)
+                score = 50.0 + round(50 * recall, 2)
             else:
                 score = 50.0
         else:
-            score = 100.0
+            score = 0.0
 
         print("User Requested Set:", user_requested_set)
         print("Predicted Set:", predicted_set)
