@@ -110,8 +110,7 @@ async def detect(req: DetectionRequest) -> DetectionResponse:
         user_requested_set = set(item.lower() for item in  states.USER_PROMPT_SUMMARY)
         predicted_set = set(item.lower() for item in eval_detection_summary)
 
-        print("User Requested Set:", user_requested_set)
-        print("Predicted Set:", predicted_set)
+
 
         # Compare
         matches = user_requested_set & predicted_set
@@ -121,12 +120,14 @@ async def detect(req: DetectionRequest) -> DetectionResponse:
         if isinstance(eval_detection_summary, list):
             if recall != 0.0:
             # 0.5 for getting a detection right
-                score = 50.0 + round((0.5 - recall) * 100, 2)
+                score = 50.0 + round(50 * recall, 2)
             else:
                 score = 50.0
         else:
             score = 100.0
 
+        print("User Requested Set:", user_requested_set)
+        print("Predicted Set:", predicted_set)
         print("Score:", score)
         print("Recall:", recall)
 
