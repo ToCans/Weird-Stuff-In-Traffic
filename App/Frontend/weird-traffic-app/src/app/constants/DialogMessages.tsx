@@ -100,7 +100,7 @@ export const updateDialogMessages = {
       expanded: {
         type: "detectionResult" as const,
         baseMessageInitial: specificMessage,
-        baseMessageExpanded: `${specificMessage}\n\nAI analysis: ${score}% accuracy. You've received ${points} points.`,
+        baseMessageExpanded: `${specificMessage}\n\nAI analysis score: ${score}. You've received ${points} points.`,
         score: score,
         points: points,
       },

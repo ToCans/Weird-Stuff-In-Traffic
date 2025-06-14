@@ -59,7 +59,7 @@ async def detect(req: DetectionRequest) -> DetectionResponse:
             return DetectionResponse(
                 prompt=req.prompt,
                 imageBase64=req.imageBase64,
-                score=1.0
+                score=0.0
             )
 
         # Annotate image
@@ -104,25 +104,26 @@ async def detect(req: DetectionRequest) -> DetectionResponse:
             device=states.DEVICE
         )
 
-        eval_detection_summary = ast.literal_eval(detection_summary)
+        try:
+            eval_detection_summary = ast.literal_eval(detection_summary)
+            user_requested_set = set(item.lower() for item in  states.USER_PROMPT_SUMMARY)
+            predicted_set = set(item.lower() for item in eval_detection_summary)
+            matches = user_requested_set & predicted_set
+            recall = len(matches) / len(user_requested_set) if user_requested_set else 0.0
+        except:
+            recall = 0.0
 
-        # Normalize to lowercase
-        user_requested_set = set(item.lower() for item in  states.USER_PROMPT_SUMMARY)
-        predicted_set = set(item.lower() for item in eval_detection_summary)
-
-        print("User Requested Set:", user_requested_set)
-        print("Predicted Set:", predicted_set)
-
-        # Compare
-        matches = user_requested_set & predicted_set
-        recall = len(matches) / len(user_requested_set) if user_requested_set else 0.0
-
-        if isinstance(eval_detection_summary, list):
-            # 0.5 for getting a detection right
-            score = round((1.0 - recall) * 100, 2)
+        # Scoring
+        if boxes:
+            if recall != 0.0:
+                score = 50.0 + round(50 * recall, 2)
+            else:
+                score = 50.0
         else:
             score = 0.0
 
+        print("User Requested Set:", user_requested_set)
+        print("Predicted Set:", predicted_set)
         print("Score:", score)
         print("Recall:", recall)
 

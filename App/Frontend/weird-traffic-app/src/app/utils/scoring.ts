@@ -1,20 +1,20 @@
 /**
  * Calculates the user's score based on AI prediction accuracy (lower accuracy = higher score).
- * @param {number} accuracy - AI's prediction accuracy (expected 0-100).
- * @param {number} maxScore - Maximum possible score per prompt (default: 10).
+ * @param {number} score - AI's prediction score (expected 0-100).
+ * @param {number} maxPoints - Maximum possible points per prompt (default: 10).
  * @returns {number} The score the user earns for this prompt.
  */
-export const calculateUserScore = (
-  accuracy: number,
-  maxScore: number = 10
+export const calculateUserPoints = (
+  score: number,
+  maxPoints: number = 10
 ): number => {
-  if (accuracy < 0 || accuracy > 100) {
-    console.error("Accuracy out of bounds:", accuracy);
-    accuracy = Math.max(0, Math.min(100, accuracy)); // Clamp between 0 and 100
+  if (score < 0 || score > 100) {
+    console.error("Score out of bounds:", score);
+    score = Math.max(0, Math.min(100, score)); // Clamp between 0 and 100
   }
-  const score = maxScore * (1 - accuracy / 100);
+  const returnedPoints = maxPoints * (1 - score / 100);
   // round to the nearest integer
-  return Math.round(score);
+  return Math.round(returnedPoints);
 };
 
 /**
