@@ -13,7 +13,7 @@ def preprocess(instruction: str, image_np: np.ndarray,
     image = Image.fromarray(image_np)
 
     # System Instructions
-    system_instruction = "You are an assistant that return a list of objects as strings in the image."
+    system_instruction = "You are an assistant that return a list of objects as strings in the image. Example: ['x', 'y', 'z']"
 
     # Formatting the Chat
     chat = [
