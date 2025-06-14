@@ -6,14 +6,23 @@ import torch
 import numpy as np
 import transformers
 
+MIN_SIZE = 28  # From the error
+
 def preprocess(instruction: str, image_np: np.ndarray,
                processor: transformers.AutoProcessor) -> transformers.BatchEncoding:
     """Preprocesses the image and prompt into the correct format for the VLM."""
+
     # Opening Image
     image = Image.fromarray(image_np)
 
+    # --- Resize if too small ---
+    if image.height < MIN_SIZE or image.width < MIN_SIZE:
+        new_width = max(image.width, MIN_SIZE)
+        new_height = max(image.height, MIN_SIZE)
+        image = image.resize((new_width, new_height))
+
     # System Instructions
-    system_instruction = "You are an assistant that return a list of objects as strings in the image. Example: ['x', 'y', 'z']"
+    system_instruction = "You are an assistant that returns a list of objects as strings in the image. Example: ['x', 'y', 'z']"
 
     # Formatting the Chat
     chat = [
@@ -22,10 +31,10 @@ def preprocess(instruction: str, image_np: np.ndarray,
             "content": [{"type": "text", "text": system_instruction}],
         },
         {
-        "role": "user",
-        "content": [
-            {"type": "image", "image": image},
-            {"type": "text", "text": {instruction}},
+            "role": "user",
+            "content": [
+                {"type": "image", "image": image},
+                {"type": "text", "text": instruction},
             ],
         }
     ]
