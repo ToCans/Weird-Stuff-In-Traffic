@@ -110,39 +110,27 @@ export const ShareModal2: React.FC<ShareModalProps> = ({
         {/* Social Media Icons */}
         <div className="flex justify-center items-center gap-3 sm:gap-4">
           <SocialIcon
-            href={`https://www.instagram.com/?url=${encodeURIComponent(
-              displayImageUrl
-            )}`} // Instagram doesn't directly support URL sharing this way, this is a placeholder
+            href="https://www.instagram.com/"
             icon={Instagram}
             label="Instagram"
           />
           <SocialIcon
-            href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-              displayImageUrl
-            )}`}
+            href="https://www.facebook.com/"
             icon={Facebook}
             label="Facebook"
           />
           <SocialIcon
-            href={`https://www.pinterest.com/pin/create/button/?url=${encodeURIComponent(
-              displayImageUrl
-            )}&media=${encodeURIComponent(
-              displayImageUrl
-            )}&description=Check%20out%20my%20result!`}
-            icon={Twitter} // Using Twitter as placeholder for Pinterest, as lucide-react might not have Pinterest
-            label="Pinterest"
+            href="https://twitter.com/"
+            icon={Twitter}
+            label="Twitter"
           />
           <SocialIcon
-            href={`https://wa.me/?text=Check%20out%20my%20result!%20${encodeURIComponent(
-              displayImageUrl
-            )}`}
-            icon={MessageCircle} // Placeholder for WhatsApp
+            href="https://wa.me/"
+            icon={MessageCircle}
             label="WhatsApp"
           />
           <SocialIcon
-            href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
-              displayImageUrl
-            )}`}
+            href="https://www.linkedin.com/"
             icon={Linkedin}
             label="LinkedIn"
           />

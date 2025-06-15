@@ -12,7 +12,7 @@ import { DetectionResultPayload } from "@/app/constants/DialogMessages";
 import { MessageActions } from "@/app/components/game/MessageActions";
 import { SlotmachineGame } from "@/app/components/game/SlotMachine";
 import { ClapwordsGame } from "@/app/components/game/ClapwordsGame";
-import { useChatLogic } from "@/app/hooks/useChatLogic";
+import { useGameStore, useUIStore } from "@/app/stores";
 import { Modal } from "@/app/components/modals/ShareModal_1";
 import { ShareModal2 } from "@/app/components/modals/ShareModal_2";
 import dynamic from "next/dynamic";
@@ -34,28 +34,30 @@ export default function ChatPage() {
     earnedPoints,
     trainingProgress,
     detectionCount,
-    resetDetectionCount,
     signalModalOpen,
     carAnimationState,
-    resetSignalModalOpen,
     setPrompt,
     handleGenerate,
     handleImageSelect,
-    handleCopyMessage,
-    handleEditMessage,
     handleSwitchView,
     finalizeScoreUpdate,
     handleTypeAnimationComplete,
-  } = useChatLogic();
+    resetDetectionCount,
+    setSignalModalOpen,
+    handleCopyMessage,
+    handleEditMessage,
+  } = useGameStore();
+
+  const {
+    isShareModalOpen,
+    isShareModal2Open,
+    sharedImageUrlForModal2,
+    toggleShareModal,
+    toggleShareModal2,
+  } = useUIStore();
 
   const chatContainerRef = useRef<HTMLDivElement>(null);
-  const [isShareModalOpen, setIsShareModalOpen] = useState<boolean>(false);
   const modalTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  const [isShareModal2Open, setIsShareModal2Open] = useState<boolean>(false);
-  const [sharedImageUrlForModal2, setSharedImageUrlForModal2] = useState<
-    string | null
-  >(null);
 
   useEffect(() => {
     if (modalTimeoutRef.current) {
@@ -65,8 +67,7 @@ export default function ChatPage() {
 
     if (signalModalOpen) {
       modalTimeoutRef.current = setTimeout(() => {
-        setIsShareModalOpen(true);
-        resetSignalModalOpen();
+        toggleShareModal();
         modalTimeoutRef.current = null;
       }, 2000);
     }
@@ -78,7 +79,7 @@ export default function ChatPage() {
         modalTimeoutRef.current = null;
       }
     };
-  }, [signalModalOpen, resetSignalModalOpen]);
+  }, [signalModalOpen, toggleShareModal]);
 
   const animationSequence = useMemo(() => {
     const sequenceItems: (string | number | (() => void))[] = [];
@@ -135,34 +136,31 @@ export default function ChatPage() {
   }, [messages, activeView]);
 
   const handleCloseShareModal = () => {
-    setIsShareModalOpen(false);
+    toggleShareModal();
     resetDetectionCount();
   };
 
-  const handleOpenShareModal2 = useCallback((imageUrl: string) => {
-    setSharedImageUrlForModal2(imageUrl);
-    setIsShareModal2Open(true);
-  }, []);
+  const handleOpenShareModal2 = useCallback(
+    (imageUrl: string) => {
+      toggleShareModal2(imageUrl);
+    },
+    [toggleShareModal2]
+  );
 
   const handleCloseShareModal2 = useCallback(() => {
-    setIsShareModal2Open(false);
-    setSharedImageUrlForModal2(null);
-  }, []);
+    toggleShareModal2();
+  }, [toggleShareModal2]);
 
   return (
     <div className="h-screen w-screen flex flex-col bg-background overflow-hidden">
       <div style={{ height: "5rem" }}>
-        <Header
-          onSwitchView={handleSwitchView}
-          earnedPoints={earnedPoints}
-          trainingProgress={trainingProgress}
-        />
+        <Header />
       </div>
       {/* Main content area - Grid layout - Responsive */}
       <div className="flex flex-col md:flex-row flex-1 overflow-y-auto md:overflow-hidden">
         {/* 3 column grid */}
         {/* Column 1: Dialog and Car */}
-        <div className="w-full md:w-1/3 flex flex-col justify-between p-4 md:p-6 md:ml-10 md:mt-10 order-2 md:order-1">
+        <div className="w-full md:w-1/3 flex flex-col justify-between p-4 md:p-6 md:ml-10 md:mt-10 order-2 md:order-1 overflow-y-auto custom-scrollbar">
           {/* Dialog */}
           <div
             className="max-w-xs mx-auto md:mx-0 animate-slide-up-fade-in z-10 relative"

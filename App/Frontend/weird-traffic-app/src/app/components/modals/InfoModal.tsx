@@ -108,22 +108,22 @@ export const InfoModal: React.FC<InfoModalProps> = ({ isOpen, onClose }) => {
         {/* Content Area */}
         <div className="mt-4">
           {activeTab === "scoring" && (
-            <div className="h-[400px] w-full overflow-y-auto custom-scrollbar">
+            <div className="h-[410px] w-full overflow-y-auto custom-scrollbar">
               <div className="flex justify-between text-sm text-foreground mb-2 px-2">
                 <span>Recognized</span>
                 <span>Points</span>
               </div>
               <ul className="flex flex-col">
                 {scoringData.map((item, index) => (
-                  <React.Fragment key={index}>
+                  <li key={item.recognized}>
                     {index > 0 && (
-                      <div className="h-px bg-weird-gradient mx-2" />
+                      <div className="h-[2px] bg-weird-gradient mx-2" />
                     )}
-                    <li className="flex justify-between py-2 px-2 text-sm">
+                    <div className="flex justify-between py-2 px-2 text-sm">
                       <span>{item.recognized}</span>
                       <span>{item.points}</span>
-                    </li>
-                  </React.Fragment>
+                    </div>
+                  </li>
                 ))}
               </ul>
             </div>

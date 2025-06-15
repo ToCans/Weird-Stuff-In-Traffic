@@ -5,6 +5,8 @@ import { Button } from "../ui/Button";
 import { slotMachineWords } from "../../constants/SlotWords";
 import { ArrowLeft } from "lucide-react";
 import { RotateCcw } from "lucide-react";
+import { useSlotMachineStore } from "@/app/stores";
+import { useGameStore } from "@/app/stores";
 
 // Define view types matching page.tsx
 type ActiveView = "chat" | "slotmachine" | "clapwords" | "fillblank";
@@ -20,14 +22,18 @@ export const SlotmachineGame: React.FC<SlotmachineGameProps> = ({
   setPrompt,
   setActiveView,
 }) => {
-  const [word1, setWord1] = useState("---");
-  const [word2, setWord2] = useState("---");
-  const [word3, setWord3] = useState("---");
-  const [displayWord1, setDisplayWord1] = useState("---");
-  const [displayWord2, setDisplayWord2] = useState("---");
-  const [displayWord3, setDisplayWord3] = useState("---");
-  const [isSpinning, setIsSpinning] = useState(false);
-  const [spinCompleted, setSpinCompleted] = useState(false);
+  const {
+    word1,
+    word2,
+    word3,
+    displayWord1,
+    displayWord2,
+    displayWord3,
+    isSpinning,
+    spinCompleted,
+    spin,
+    reset,
+  } = useSlotMachineStore();
 
   // Helper function to get a random word from a list
   const getRandomWord = (category: string[]): string => {
@@ -41,34 +47,7 @@ export const SlotmachineGame: React.FC<SlotmachineGameProps> = ({
   const handleSpin = () => {
     if (isSpinning) return; // Do nothing if already spinning
 
-    setIsSpinning(true);
-    setSpinCompleted(false); // Reset completion on new spin
-
-    // Placeholder for final words, set after timeout
-    setWord1("");
-    setWord2("");
-    setWord3("");
-
-    // Start timeout for spin duration
-    const spinTimeout = setTimeout(() => {
-      const finalWord1 = getRandomWord(slotMachineWords.nouns);
-      const finalWord2 = getRandomWord(slotMachineWords.verbs);
-      const finalWord3 = getRandomWord(slotMachineWords.places);
-
-      setWord1(finalWord1);
-      setWord2(finalWord2);
-      setWord3(finalWord3);
-
-      setDisplayWord1(finalWord1);
-      setDisplayWord2(finalWord2);
-      setDisplayWord3(finalWord3);
-
-      setIsSpinning(false);
-      setSpinCompleted(true);
-    }, 3000); // 5 seconds spin duration
-
-    // Cleanup timeout if component unmounts or spin is re-triggered
-    return () => clearTimeout(spinTimeout);
+    spin();
   };
 
   // Effect for the spinning animation interval
@@ -76,15 +55,8 @@ export const SlotmachineGame: React.FC<SlotmachineGameProps> = ({
     let animationInterval: ReturnType<typeof setInterval> | undefined;
     if (isSpinning) {
       animationInterval = setInterval(() => {
-        setDisplayWord1(getRandomWord(slotMachineWords.nouns));
-        setDisplayWord2(getRandomWord(slotMachineWords.verbs));
-        setDisplayWord3(getRandomWord(slotMachineWords.places));
+        // This is handled by the store
       }, 50); // Update every 50ms for fast visual effect
-    } else {
-      // If not spinning, ensure display words match final words (or initial '---')
-      setDisplayWord1(word1 || "---");
-      setDisplayWord2(word2 || "---");
-      setDisplayWord3(word3 || "---");
     }
 
     // Cleanup interval on unmount or when isSpinning becomes false
@@ -94,7 +66,7 @@ export const SlotmachineGame: React.FC<SlotmachineGameProps> = ({
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSpinning, word1, word2, word3]); // Add word states to dependency array
+  }, [isSpinning]); // Add isSpinning to dependency array
 
   // Function to handle clicking on a word box
   const handleWordClick = (word: string) => {
