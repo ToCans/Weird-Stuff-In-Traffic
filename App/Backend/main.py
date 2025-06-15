@@ -46,8 +46,8 @@ async def lifespan(_):
     states.GENERATION_MODEL.scheduler = DPMSolverMultistepScheduler.from_config(states.GENERATION_MODEL.scheduler.config)
     states.WEIRD_DETECTION_MODEL = DefaultPredictor(detectron_cfg)
     states.STREET_DETECTION_MODEL = YOLO(full_street_detection_detection_model_path).to(states.DEVICE)
-    states.DETECTION_DESCRIPTION_PROCESSOR = transformers.Qwen2VLProcessor.from_pretrained("Qwen/Qwen2-VL-2B-Instruct", use_fast=True)
-    states.DETECTION_DESCRIPTION_MODEL = transformers.Qwen2VLForConditionalGeneration.from_pretrained("Qwen/Qwen2-VL-2B-Instruct", torch_dtype=torch.float16).to(states.DEVICE)
+    states.DETECTION_DESCRIPTION_PROCESSOR = transformers.Qwen2VLProcessor.from_pretrained("Qwen/Qwen2-VL-7B-Instruct", use_fast=True)
+    states.DETECTION_DESCRIPTION_MODEL = transformers.Qwen2VLForConditionalGeneration.from_pretrained("Qwen/Qwen2-VL-7B-Instruct", torch_dtype=torch.float16).to(states.DEVICE)
     print(f"Using {states.DEVICE}.")
     print("Models loaded.")
     yield
