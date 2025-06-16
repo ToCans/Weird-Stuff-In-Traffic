@@ -8,6 +8,7 @@ import os
 import datetime
 import uuid
 import ast
+import difflib
 
 # Third-party
 import cv2
@@ -106,9 +107,16 @@ async def detect(req: DetectionRequest) -> DetectionResponse:
 
         try:
             eval_detection_summary = ast.literal_eval(detection_summary)
-            user_requested_set = set(item.lower() for item in  states.USER_PROMPT_SUMMARY)
+            user_requested_set = set(item.lower() for item in states.USER_PROMPT_SUMMARY)
             predicted_set = set(item.lower() for item in eval_detection_summary)
-            matches = user_requested_set & predicted_set
+
+            matches = set()
+
+            for target in user_requested_set:
+                best_match = difflib.get_close_matches(target, predicted_set, n=1, cutoff=0.6)  # Tune cutoff as needed
+                if best_match:
+                    matches.add(target)  # Count as a correct prediction
+
             recall = len(matches) / len(user_requested_set) if user_requested_set else 0.0
         except:
             recall = 0.0
