@@ -68,3 +68,13 @@ def generate_response(model_inputs, base_model: transformers.Qwen2VLForCondition
         )
 
     return output_texts[0]
+
+def is_partial_match(user_term, predicted_terms):
+    """ Partial Matches between prompts and summary."""
+    user_term = user_term.lower()
+    for pred in predicted_terms:
+        pred = pred.lower()
+        # Direct substring or token match
+        if user_term in pred or pred in user_term:
+            return True
+    return False

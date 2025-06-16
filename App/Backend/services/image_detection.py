@@ -13,13 +13,12 @@ import difflib
 # Third-party
 import cv2
 from detectron2.utils.visualizer import Visualizer, ColorMode
-from detectron2.data import MetadataCatalog
 
 # Local application
 from schemas.images import DetectionRequest, DetectionResponse
 from models.configurations import test_metadata
 from services import states
-from services.image_summary import preprocess, generate_response
+from services.image_summary import preprocess, generate_response, is_partial_match
 from services.image_utils import base64_to_image
 
 ### Full Image Detection Pipeline ###
@@ -105,30 +104,31 @@ async def detect(req: DetectionRequest) -> DetectionResponse:
             device=states.DEVICE
         )
 
-        try:
-            eval_detection_summary = ast.literal_eval(detection_summary)
-            user_requested_set = set(item.lower() for item in states.USER_PROMPT_SUMMARY)
-            predicted_set = set(item.lower() for item in eval_detection_summary)
+    try:
+        eval_detection_summary = ast.literal_eval(detection_summary)
+        user_requested_set = set(item.lower() for item in states.USER_PROMPT_SUMMARY)
+        predicted_set = set(item.lower() for item in eval_detection_summary)
 
-            matches = set()
+        matches = set()
 
-            for target in user_requested_set:
-                best_match = difflib.get_close_matches(target, predicted_set, n=1, cutoff=0.6)  # Tune cutoff as needed
-                if best_match:
-                    matches.add(target)  # Count as a correct prediction
+        for user_item in user_requested_set:
+            if user_item in predicted_set:
+                matches.add(user_item)
+            elif is_partial_match(user_item, predicted_set):
+                matches.add(user_item)
 
-            recall = len(matches) / len(user_requested_set) if user_requested_set else 0.0
-        except:
-            recall = 0.0
+        recall = len(matches) / len(user_requested_set) if user_requested_set else 0.0
+    except Exception as e:
+        recall = 0.0
 
-        # Scoring
-        if boxes:
-            if recall != 0.0:
-                score = 50.0 + round(50 * recall, 2)
-            else:
-                score = 50.0
+    # Scoring
+    if boxes:
+        if recall != 0.0:
+            score = 50.0 + round(50 * recall, 2)
         else:
-            score = 0.0
+            score = 50.0
+    else:
+        score = 0.0
 
         print("User Requested Set:", user_requested_set)
         print("Predicted Set:", predicted_set)
