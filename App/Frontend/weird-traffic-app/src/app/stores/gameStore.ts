@@ -8,7 +8,7 @@ import {
   type DialogSequence,
 } from "@/app/constants/DialogMessages";
 import {
-  calculateUserScore,
+  calculateUserPoints,
   calculateProgressIncrement,
 } from "@/app/utils/scoring";
 import {
@@ -278,13 +278,13 @@ export const useGameStore = create<GameStore>()(
             }
 
             const result: DetectApiResponse = await response.json();
-            const similarityScore = result.score;
+            const score = result.score;
             const detectedImage = result.imageBase64;
-            const points = calculateUserScore(similarityScore);
+            const points = calculateUserPoints(score);
 
-            if (similarityScore >= 0 && similarityScore < 50) {
+            if (score >= 0 && score < 50) {
               setCarAnimationState("laughing");
-            } else if (similarityScore >= 50 && similarityScore <= 100) {
+            } else if (score >= 50 && score <= 100) {
               setCarAnimationState("sad");
             } else {
               setCarAnimationState("speaking");
@@ -293,22 +293,19 @@ export const useGameStore = create<GameStore>()(
             updateMessage(messageId, {
               isDetecting: false,
               detectedImageUrl: detectedImage,
-              lastDetectionAccuracy: similarityScore,
+              lastDetectionAccuracy: score,
               lastDetectionPoints: points,
             });
 
-            if (typeof similarityScore === "number") {
+            if (typeof score === "number") {
               const currentDetectionCount = get().detectionCount + 1;
               get().incrementDetectionCount();
 
               setDialogSequence(
-                updateDialogMessages.detectionResult(similarityScore, points)
+                updateDialogMessages.detectionResult(score, points)
               );
             } else {
-              console.error(
-                "Invalid similarity score received:",
-                similarityScore
-              );
+              console.error("Invalid score received:", score);
               setDialogSequence(DialogMessages.error);
             }
           } catch (error) {

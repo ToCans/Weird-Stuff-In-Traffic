@@ -12,7 +12,7 @@ import {
   DetectionResultPayload, // Keep type here for now, or move to types/dialog.ts?
 } from "../constants/DialogMessages"; // Note: Path might need update
 import {
-  calculateUserScore,
+  calculateUserPoints,
   calculateProgressIncrement, // Now this will be used
 } from "../utils/scoring"; // Note: Path will need update to lib/
 
@@ -167,22 +167,22 @@ export function useChatLogic() {
       }
 
       const result: DetectApiResponse = await response.json();
-      const similarityScore = result.score;
+      const score = result.score;
       const detectedImage = result.imageBase64; // Extract detectedImage
 
       /* Backend will handle the points calculations */
-      const points = calculateUserScore(similarityScore);
+      const points = calculateUserPoints(score);
 
       console.log(
         "Detection API call successful. Score:",
-        similarityScore,
+        score,
         "Points:",
         points
       );
 
-      if (similarityScore >= 0 && similarityScore < 50) {
+      if (score >= 0 && score < 50) {
         setCarAnimationState("laughing");
-      } else if (similarityScore >= 50 && similarityScore <= 100) {
+      } else if (score >= 50 && score <= 100) {
         setCarAnimationState("sad");
       } else {
         setCarAnimationState("speaking");
@@ -195,14 +195,14 @@ export function useChatLogic() {
                 ...msg,
                 isDetecting: false,
                 detectedImageUrl: detectedImage, // Store the detected image URL
-                lastDetectionAccuracy: similarityScore, // Store accuracy
+                lastDetectionAccuracy: score, // Store accuracy
                 lastDetectionPoints: points, // Store points
               }
             : msg
         )
       );
 
-      if (typeof similarityScore === "number") {
+      if (typeof score === "number") {
         // Increment detection count *after* successful API call and *before* setting dialog
         let updatedDetectionCount = 0;
         setDetectionCount((prev) => {
@@ -214,14 +214,12 @@ export function useChatLogic() {
         });
 
         // Now set the dialog sequence which will trigger the animation
-        setDialogSequence(
-          updateDialogMessages.detectionResult(similarityScore, points)
-        );
+        setDialogSequence(updateDialogMessages.detectionResult(score, points));
         console.log(
           `Calculated ${points} points. Dialog updated, waiting for animation to finalize state.`
         );
       } else {
-        console.error("Invalid similarity score received:", similarityScore);
+        console.error("Invalid score received:", score);
         setDialogSequence(DialogMessages.error);
       }
     } catch (error) {
