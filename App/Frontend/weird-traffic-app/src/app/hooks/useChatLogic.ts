@@ -1,3 +1,4 @@
+//DONT USED ANYMORE - USE stores/gameStore.ts INSTEAD
 import { useState, useCallback, useEffect } from "react";
 import type {
   Message,
