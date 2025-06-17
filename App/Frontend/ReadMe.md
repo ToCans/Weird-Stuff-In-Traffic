@@ -48,8 +48,6 @@ _Detection_
 
 ## 📁 Project Structure
 
-## 📁 Project Structure
-
 - **`weird-traffic-app/`** - The root directory of the Next.js application.
   - **`public/`**: Contains static assets like images (`car.png`).
   - **`src/app/`**: The core of the application, following the Next.js App Router structure.
