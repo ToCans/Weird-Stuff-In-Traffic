@@ -97,6 +97,7 @@ async def detect(req: DetectionRequest) -> DetectionResponse:
             processor=states.DETECTION_DESCRIPTION_PROCESSOR
         )
 
+        # Summary of detection
         detection_summary = generate_response(
             processed_prompt,
             states.DETECTION_DESCRIPTION_MODEL,
@@ -104,30 +105,28 @@ async def detect(req: DetectionRequest) -> DetectionResponse:
             device=states.DEVICE
         )
 
+        # Methods used for scoring
         try:
             eval_detection_summary = ast.literal_eval(detection_summary)
             user_requested_set = set(item.lower() for item in states.USER_PROMPT_SUMMARY)
             predicted_set = set(item.lower() for item in eval_detection_summary)
 
-            matches = set()
+            def is_partial_match(user_item, predicted_set):
+                return any(user_item in pred_item or pred_item in user_item for pred_item in predicted_set)
 
-            for user_item in user_requested_set:
-                if user_item in predicted_set:
-                    matches.add(user_item)
-                elif is_partial_match(user_item, predicted_set):
-                    matches.add(user_item)
+            matches = {
+                user_item for user_item in user_requested_set
+                if user_item in predicted_set or is_partial_match(user_item, predicted_set)
+            }
 
             recall = len(matches) / len(user_requested_set) if user_requested_set else 0.0
-            
-        except:
+
+        except Exception as e:
             recall = 0.0
 
         # Scoring
         if boxes:
-            if recall != 0.0:
-                score = 50.0 + round(50 * recall, 2)
-            else:
-                score = 50.0
+            score = 50.0 + round(50 * recall, 2) if recall != 0.0 else 50.0
         else:
             score = 0.0
 
