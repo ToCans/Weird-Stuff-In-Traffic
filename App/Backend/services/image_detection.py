@@ -8,17 +8,17 @@ import os
 import datetime
 import uuid
 import ast
+import difflib
 
 # Third-party
 import cv2
 from detectron2.utils.visualizer import Visualizer, ColorMode
-from detectron2.data import MetadataCatalog
 
 # Local application
 from schemas.images import DetectionRequest, DetectionResponse
 from models.configurations import test_metadata
 from services import states
-from services.image_summary import preprocess, generate_response
+from services.image_summary import preprocess, generate_response, is_partial_match
 from services.image_utils import base64_to_image
 
 ### Full Image Detection Pipeline ###
@@ -59,7 +59,7 @@ async def detect(req: DetectionRequest) -> DetectionResponse:
             return DetectionResponse(
                 prompt=req.prompt,
                 imageBase64=req.imageBase64,
-                score=1.0
+                score=0.0
             )
 
         # Annotate image
@@ -97,6 +97,7 @@ async def detect(req: DetectionRequest) -> DetectionResponse:
             processor=states.DETECTION_DESCRIPTION_PROCESSOR
         )
 
+        # Summary of detection
         detection_summary = generate_response(
             processed_prompt,
             states.DETECTION_DESCRIPTION_MODEL,
@@ -104,25 +105,33 @@ async def detect(req: DetectionRequest) -> DetectionResponse:
             device=states.DEVICE
         )
 
-        eval_detection_summary = ast.literal_eval(detection_summary)
+        # Methods used for scoring
+        try:
+            eval_detection_summary = ast.literal_eval(detection_summary)
+            user_requested_set = set(item.lower() for item in states.USER_PROMPT_SUMMARY)
+            predicted_set = set(item.lower() for item in eval_detection_summary)
 
-        # Normalize to lowercase
-        user_requested_set = set(item.lower() for item in  states.USER_PROMPT_SUMMARY)
-        predicted_set = set(item.lower() for item in eval_detection_summary)
+            def is_partial_match(user_item, predicted_set):
+                return any(user_item in pred_item or pred_item in user_item for pred_item in predicted_set)
 
-        print("User Requested Set:", user_requested_set)
-        print("Predicted Set:", predicted_set)
+            matches = {
+                user_item for user_item in user_requested_set
+                if user_item in predicted_set or is_partial_match(user_item, predicted_set)
+            }
 
-        # Compare
-        matches = user_requested_set & predicted_set
-        recall = len(matches) / len(user_requested_set) if user_requested_set else 0.0
+            recall = len(matches) / len(user_requested_set) if user_requested_set else 0.0
 
-        if isinstance(eval_detection_summary, list):
-            # 0.5 for getting a detection right
-            score = round((1.0 - recall) * 100, 2)
+        except Exception as e:
+            recall = 0.0
+
+        # Scoring
+        if boxes:
+            score = 50.0 + round(50 * recall, 2) if recall != 0.0 else 50.0
         else:
             score = 0.0
 
+        print("User Requested Set:", user_requested_set)
+        print("Predicted Set:", predicted_set)
         print("Score:", score)
         print("Recall:", recall)
 

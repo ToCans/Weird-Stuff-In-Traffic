@@ -169,14 +169,12 @@ export function useChatLogic() {
       const result: DetectApiResponse = await response.json();
       const score = result.score;
       const detectedImage = result.imageBase64; // Extract detectedImage
-
-      /* Backend will handle the points calculations */
-      const points = calculateUserPoints(score);
+      const points = calculateUserPoints(score); // Calculate points based on score
 
       console.log(
         "Detection API call successful. Score:",
         score,
-        "Points:",
+        "Points earned:",
         points
       );
 
@@ -195,7 +193,7 @@ export function useChatLogic() {
                 ...msg,
                 isDetecting: false,
                 detectedImageUrl: detectedImage, // Store the detected image URL
-                lastDetectionAccuracy: score, // Store accuracy
+                lastDetectionScore: score, // Store score
                 lastDetectionPoints: points, // Store points
               }
             : msg
@@ -219,7 +217,7 @@ export function useChatLogic() {
           `Calculated ${points} points. Dialog updated, waiting for animation to finalize state.`
         );
       } else {
-        console.error("Invalid score received:", score);
+        console.error("Invalid similarity score received:", score);
         setDialogSequence(DialogMessages.error);
       }
     } catch (error) {
