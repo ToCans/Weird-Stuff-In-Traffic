@@ -106,6 +106,9 @@ async def detect(req: DetectionRequest) -> DetectionResponse:
         )
 
         # Methods used for scoring
+        print("Detection Summary:", detection_summary)
+        print("User prompt summary:", states.USER_PROMPT_SUMMARY)
+        
         try:
             eval_detection_summary = ast.literal_eval(detection_summary)
             user_requested_set = set(item.lower() for item in states.USER_PROMPT_SUMMARY)
