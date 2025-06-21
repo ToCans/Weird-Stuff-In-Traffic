@@ -22,7 +22,7 @@ def preprocess(instruction: str, image_np: np.ndarray,
         image = image.resize((new_width, new_height))
 
     # System Instructions
-    system_instruction = "You are an assistant that returns a list of objects as strings in the image."
+    system_instruction = "You are an assistant that returns a list of objects as strings in the image. Like so: ['car', 'tree', 'person']"
 
     # Formatting the Chat
     chat = [
