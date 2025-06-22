@@ -13,11 +13,11 @@ const config: Config = {
         "4xl": "2rem",
       },
       backgroundColor: {
-        background: "var(--background)",
+        background: "#1f1f1f",
       },
       fontFamily: {
-        sans: ["var(--font-jetbrains-mono)", "sans-serif"],
-        mono: ["var(--font-jetbrains-mono)", "monospace"],
+        sans: ["JetBrains Mono", "sans-serif"],
+        mono: ["JetBrains Mono", "monospace"],
       },
     },
   },
