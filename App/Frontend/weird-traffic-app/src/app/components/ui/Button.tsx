@@ -17,13 +17,13 @@ const baseStyles =
 
 const variants = {
   primary:
-    "text-background bg-weird-gradient hover:shadow-[0_0_8px_#B9E55A] hover:scale-[1.02] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:scale-100",
+    "text-[#171717] bg-weird-gradient hover:shadow-[0_0_8px_#B9E55A] hover:scale-[1.02] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:scale-100",
   secondary:
-    "bg-[var(--gray)] text-foreground hover:shadow-[0_0_16px_#B9E55A] hover:scale-[1.02] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:scale-100",
+    "bg-[#383838] text-[white] hover:shadow-[0_0_16px_#B9E55A] hover:scale-[1.02] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:scale-100",
   active:
-    "text-background bg-weird-gradient scale-[1.03] cursor-pointer hover:shadow-[0_0_16px_#B9E55A] disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:scale-100",
+    "text-[#171717] bg-weird-gradient scale-[1.03] cursor-pointer hover:shadow-[0_0_16px_#B9E55A] disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:scale-100",
   ghost:
-    "bg-transparent border border-[#B9E55A] text-[#B9E55A] hover:bg-[#B9E55A] hover:text-[var(--dark-gray)] focus:bg-[#B9E55A] focus:text-[var(--dark-gray)] disabled:opacity-50 disabled:cursor-not-allowed disabled:text-gray-500 disabled:border-gray-500 disabled:bg-transparent",
+    "bg-transparent border border-[#B9E55A] text-[#B9E55A] hover:bg-[#B9E55A] hover:text-dark-gray focus:bg-[#B9E55A] focus:text-dark-gray disabled:opacity-50 disabled:cursor-not-allowed disabled:text-gray-500 disabled:border-gray-500 disabled:bg-transparent",
 };
 
 const sizes = {

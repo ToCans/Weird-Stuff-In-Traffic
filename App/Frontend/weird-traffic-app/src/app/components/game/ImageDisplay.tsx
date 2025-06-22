@@ -105,7 +105,7 @@ export const ImageDisplay: React.FC<ImageDisplayProps> = ({
 
   return (
     // Main container should have some padding and background
-    <div className="w-full p-1 rounded-4xl bg-background">
+    <div className="w-full p-1 rounded-4xl bg-[#1f1f1f]">
       {selectedImageIndex !== null ? (
         <div className="relative w-full aspect-video rounded-4xl transition-all duration-300 group">
           <Image
@@ -159,36 +159,36 @@ export const ImageDisplay: React.FC<ImageDisplayProps> = ({
         <div className="grid grid-cols-2 gap-3">
           {isLoading
             ? // If loading, show 4 skeletons (placeholders)
-            [...Array(4)].map((_, index) => (
-              <div
-                key={`loading-${index}`}
-                className="skeleton aspect-video w-full"
-              />
-            ))
-            : // If loading finished, show images
-            imageUrls.map((imageUrl, index) => (
-              // Each image is a clickable button
-              <button
-                key={index}
-                onClick={() => handleImageClick(imageUrl, index)}
-                className="relative w-full aspect-video overflow-hidden rounded-4xl border-2 border-[var(--gray)] hover:border-2 hover:border-[var(--green)] transition-all duration-200 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background focus:ring-[var(--green)]"
-                aria-label={`Select image ${index + 1}`}
-                tabIndex={0}
-              >
-                <Image
-                  src={imageUrl}
-                  alt={`${altTextPrefix} ${index + 1}`}
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-200"
-                  priority={index < 2}
-                  sizes="(max-width: 768px) 50vw, (max-width: 1200px) 30vw, 25vw"
-                  onError={(e) => {
-                    console.error("Image failed to load:", imageUrl);
-                    e.currentTarget.style.display = "none";
-                  }}
+              [...Array(4)].map((_, index) => (
+                <div
+                  key={`loading-${index}`}
+                  className="skeleton aspect-video w-full"
                 />
-              </button>
-            ))}
+              ))
+            : // If loading finished, show images
+              imageUrls.map((imageUrl, index) => (
+                // Each image is a clickable button
+                <button
+                  key={index}
+                  onClick={() => handleImageClick(imageUrl, index)}
+                  className="relative w-full aspect-video overflow-hidden rounded-4xl border-2 border-[var(--gray)] hover:border-2 hover:border-[var(--green)] transition-all duration-200 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background focus:ring-[var(--green)]"
+                  aria-label={`Select image ${index + 1}`}
+                  tabIndex={0}
+                >
+                  <Image
+                    src={imageUrl}
+                    alt={`${altTextPrefix} ${index + 1}`}
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-200"
+                    priority={index < 2}
+                    sizes="(max-width: 768px) 50vw, (max-width: 1200px) 30vw, 25vw"
+                    onError={(e) => {
+                      console.error("Image failed to load:", imageUrl);
+                      e.currentTarget.style.display = "none";
+                    }}
+                  />
+                </button>
+              ))}
         </div>
       )}
     </div>

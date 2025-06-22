@@ -150,7 +150,7 @@ export default function ChatPage() {
   }, []);
 
   return (
-    <div className="h-screen w-screen flex flex-col bg-background overflow-hidden">
+    <div className="h-screen w-screen flex flex-col bg-[#1f1f1f] overflow-hidden">
       <div style={{ height: "5rem" }}>
         <Header
           onSwitchView={handleSwitchView}
