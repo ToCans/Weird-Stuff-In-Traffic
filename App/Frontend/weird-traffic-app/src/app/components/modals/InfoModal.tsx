@@ -109,7 +109,7 @@ export const InfoModal: React.FC<InfoModalProps> = ({ isOpen, onClose }) => {
         <div className="mt-4">
           {activeTab === "scoring" && (
             <div className="h-[410px] w-full overflow-y-auto custom-scrollbar">
-              <div className="flex justify-between text-sm text-foreground mb-2 px-2">
+              <div className="flex justify-between text-sm text-[white] mb-2 px-2">
                 <span>Recognized</span>
                 <span>Points</span>
               </div>

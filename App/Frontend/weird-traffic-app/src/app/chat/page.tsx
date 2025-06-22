@@ -152,7 +152,7 @@ export default function ChatPage() {
   }, [toggleShareModal2]);
 
   return (
-    <div className="h-screen w-screen flex flex-col bg-background overflow-hidden">
+    <div className="h-screen w-screen flex flex-col bg-[#1A1A1A] overflow-hidden">
       <div style={{ height: "5rem" }}>
         <Header />
       </div>

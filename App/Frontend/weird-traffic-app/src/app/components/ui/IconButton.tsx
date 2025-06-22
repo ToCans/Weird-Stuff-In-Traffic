@@ -51,7 +51,7 @@ export const IconButton: React.FC<IconButtonProps> = ({
           baseButtonStyles,
           "p-3",
           {
-            "bg-weird-gradient text-[var(--background)] hover:shadow-[0_0_16px_#B9E55A] cursor-pointer":
+            "bg-weird-gradient text-[#171717] hover:shadow-[0_0_16px_#B9E55A] cursor-pointer":
               !disabled,
             "bg-[#666666] text-gray-400 cursor-not-allowed": disabled,
           },

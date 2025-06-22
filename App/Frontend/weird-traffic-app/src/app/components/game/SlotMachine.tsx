@@ -234,7 +234,7 @@ export const SlotmachineGame: React.FC<SlotmachineGameProps> = ({
             <button
               onClick={handleSpin}
               onKeyDown={handleReloadKeyDown}
-              className="p-2 rounded-[12px] text-foreground hover:shadow-[0_0_16px_#B9E55A] hover:scale-[1.02] transition-colors duration-200 cursor-pointer"
+              className="p-2 rounded-[12px] text-[white] hover:shadow-[0_0_16px_#B9E55A] hover:scale-[1.02] transition-colors duration-200 cursor-pointer"
               aria-label="Spin again"
             >
               <RotateCcw size={20} />
