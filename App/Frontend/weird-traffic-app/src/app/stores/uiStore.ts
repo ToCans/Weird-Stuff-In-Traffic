@@ -1,6 +1,6 @@
 // src/stores/uiStore.ts
 import { create } from "zustand";
-import { devtools, persist } from "zustand/middleware";
+import { devtools, persist, createJSONStorage } from "zustand/middleware";
 import type { UIState } from "./types";
 
 interface UIStore extends UIState {
@@ -72,7 +72,8 @@ export const useUIStore = create<UIStore>()(
         },
       }),
       {
-        name: "weird-traffic-tutorial", // localStorage key
+        name: "weird-traffic-ui",
+        storage: createJSONStorage(() => sessionStorage),
         partialize: (state) => ({
           hasTutorialBeenShown: state.hasTutorialBeenShown,
           activeTab: state.activeTab,
