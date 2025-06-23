@@ -99,6 +99,8 @@ async def detect(req: DetectionRequest) -> DetectionResponse:
                 states.DETECTION_DESCRIPTION_PROCESSOR,
                 device=states.DEVICE
             )
+            # Detections
+            print("Detections Summary:", detection_summary)
 
             try:
                 for detection in detection_summary:
@@ -117,7 +119,7 @@ async def detect(req: DetectionRequest) -> DetectionResponse:
 
 
         print("Raw Requested Set:", states.USER_PROMPT_SUMMARY)
-        print("Raw Detection Summary:", detection_summary)
+        
 
         # Recall Calculations and handling
         try:
