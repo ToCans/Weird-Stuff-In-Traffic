@@ -105,7 +105,7 @@ async def detect(req: DetectionRequest) -> DetectionResponse:
             try:
                 for detection in ast.literal_eval(detection_summary):
                     if detection not in detection_summaries  and type(detection) is str:
-                        detection_summaries.append(str(detection))
+                        detection_summaries.append(str(detection).strip())
             except Exception as e:
                 print("Error processing detection summary:", e)
 
@@ -122,9 +122,8 @@ async def detect(req: DetectionRequest) -> DetectionResponse:
         
         # Recall Calculations and handling
         try:
-            eval_detections_summary = ast.literal_eval(detection_summaries)
             user_requested_set = set(item.lower() for item in states.USER_PROMPT_SUMMARY)
-            predicted_set = set(item.lower() for item in eval_detections_summary)
+            predicted_set = set(item.lower() for item in detection_summaries)
 
             matches = {
                 user_item for user_item in user_requested_set
@@ -134,6 +133,7 @@ async def detect(req: DetectionRequest) -> DetectionResponse:
             recall = len(matches) / len(user_requested_set) if user_requested_set else 0.0
 
         except Exception as e:
+            print("Error in recall calculation:", e)
             recall = 0.0
             predicted_set = []
 
