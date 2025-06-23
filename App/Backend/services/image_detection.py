@@ -75,40 +75,51 @@ async def detect(req: DetectionRequest) -> DetectionResponse:
         # Extract boxes
         boxes = outputs["instances"].pred_boxes if outputs["instances"].has("pred_boxes") else []
 
+        # Detection summaries
+        detection_summaries = []
+
         # Crop the first detected object
         cropped_image = detect_image
-        if len(boxes) > 0:
-            x1, y1, x2, y2 = map(int, boxes.tensor[0])
+
+        for i, box in enumerate(boxes):
+            x1, y1, x2, y2 = map(int, box.tolist())
             cropped_image = detect_image[y1:y2, x1:x2]
+
+            # Prompt preprocessing and generation (unchanged)
+            processed_prompt = preprocess(
+                instruction="Please create a list of objects in this image.",
+                image_np=cropped_image,
+                processor=states.DETECTION_DESCRIPTION_PROCESSOR
+            )
+
+            # Summary of detection
+            detection_summary = generate_response(
+                processed_prompt,
+                states.DETECTION_DESCRIPTION_MODEL,
+                states.DETECTION_DESCRIPTION_PROCESSOR,
+                device=states.DEVICE
+            )
+
+            try:
+                for detection in detection_summary:
+                    if detection not in detection_summaries  and type(detection) is str:
+                        detection_summaries.append(detection)
+            except Exception as e:
+                print("Error processing detection summary:", e)
 
         # Encode annotated image to base64 JPEG
         annotated_image_bgr = cv2.cvtColor(annotated_image, cv2.COLOR_RGB2BGR)
         success, buffer = cv2.imencode('.jpeg', annotated_image_bgr)
         if not success:
             raise ValueError("Failed to encode image.")
-
         encoded_image = base64.b64encode(buffer).decode('utf-8')
         image_base64_with_header = f"data:image/jpeg;base64,{encoded_image}"
 
-        # Prompt preprocessing and generation (unchanged)
-        processed_prompt = preprocess(
-            instruction="Please create a list of objects in this image.",
-            image_np=cropped_image,
-            processor=states.DETECTION_DESCRIPTION_PROCESSOR
-        )
-
-        # Summary of detection
-        detection_summary = generate_response(
-            processed_prompt,
-            states.DETECTION_DESCRIPTION_MODEL,
-            states.DETECTION_DESCRIPTION_PROCESSOR,
-            device=states.DEVICE
-        )
 
         print("Raw Requested Set:", states.USER_PROMPT_SUMMARY)
         print("Raw Detection Summary:", detection_summary)
 
-        # Methods used for scoring
+        # Recall Calculations and handling
         try:
             eval_detection_summary = ast.literal_eval(detection_summary)
             user_requested_set = set(item.lower() for item in states.USER_PROMPT_SUMMARY)
@@ -134,6 +145,7 @@ async def detect(req: DetectionRequest) -> DetectionResponse:
         else:
             score = 0.0
 
+        # General Prints
         print("User Requested Set:", states.USER_PROMPT_SUMMARY)
         print("Predicted Set:", predicted_set)
         print("Score:", score)
