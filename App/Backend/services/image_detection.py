@@ -105,6 +105,9 @@ async def detect(req: DetectionRequest) -> DetectionResponse:
             device=states.DEVICE
         )
 
+        print("Raw Requested Set:", states.USER_PROMPT_SUMMARY)
+        print("Raw Detection Summary:", detection_summary)
+
         # Methods used for scoring
         try:
             eval_detection_summary = ast.literal_eval(detection_summary)
@@ -123,6 +126,7 @@ async def detect(req: DetectionRequest) -> DetectionResponse:
 
         except Exception as e:
             recall = 0.0
+            predicted_set = []
 
         # Scoring
         if boxes:
@@ -130,7 +134,7 @@ async def detect(req: DetectionRequest) -> DetectionResponse:
         else:
             score = 0.0
 
-        print("User Requested Set:", user_requested_set)
+        print("User Requested Set:", states.USER_PROMPT_SUMMARY)
         print("Predicted Set:", predicted_set)
         print("Score:", score)
         print("Recall:", recall)

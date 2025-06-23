@@ -22,7 +22,7 @@ def preprocess(instruction: str, image_np: np.ndarray,
         image = image.resize((new_width, new_height))
 
     # System Instructions
-    system_instruction = "You are an assistant that returns a list of objects as strings in the image. Example: ['x', 'y', 'z']"
+    system_instruction = "You are an assistant that returns a list of objects as strings in the image. Like so: ['car', 'tree', 'person']"
 
     # Formatting the Chat
     chat = [
@@ -70,19 +70,13 @@ def generate_response(model_inputs, base_model: transformers.Qwen2VLForCondition
     return output_texts[0]
 
 def is_partial_match(user_term, predicted_terms):
-    """Enhanced partial match with token overlap."""
     user_tokens = set(user_term.lower().split())
 
     for pred in predicted_terms:
         pred_tokens = set(pred.lower().split())
 
-        # Check for any token overlap
+        # Only match if there's a token-level overlap
         if user_tokens & pred_tokens:
             return True
 
-        # Check substring in either direction
-        if user_term in pred.lower() or pred.lower() in user_term:
-            return True
-
     return False
-

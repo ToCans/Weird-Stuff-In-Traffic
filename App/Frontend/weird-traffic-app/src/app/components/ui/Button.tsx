@@ -19,7 +19,7 @@ const variants = {
   primary:
     "text-[#171717] bg-weird-gradient hover:shadow-[0_0_8px_#B9E55A] hover:scale-[1.02] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:scale-100",
   secondary:
-    "bg-[#383838] text-white hover:shadow-[0_0_16px_#B9E55A] hover:scale-[1.02] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:scale-100",
+    "bg-[#383838] text-[white] hover:shadow-[0_0_16px_#B9E55A] hover:scale-[1.02] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:scale-100",
   active:
     "text-[#171717] bg-weird-gradient scale-[1.03] cursor-pointer hover:shadow-[0_0_16px_#B9E55A] disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:scale-100",
   ghost:
