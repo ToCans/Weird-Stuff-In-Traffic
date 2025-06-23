@@ -51,7 +51,7 @@ def preprocess(instruction: str, image_np: np.ndarray,
 
 def generate_response(model_inputs, base_model: transformers.Qwen2VLForConditionalGeneration,
                       processor: transformers.AutoProcessor, device:torch.device,
-                      max_new_tokens=256):
+                      max_new_tokens=1024):
     """ Generates the desired text from the given image and prompt."""
     # Preparing device and setting inputs
     base_model.eval()
