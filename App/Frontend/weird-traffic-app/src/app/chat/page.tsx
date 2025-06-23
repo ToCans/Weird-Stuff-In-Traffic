@@ -343,10 +343,10 @@ export default function ChatPage() {
         onClose={handleCloseShareModal}
         content={
           <div className="flex flex-col items-left text-left gap-6">
-            <h3 className="text-xl text-foreground font-mono">
+            <h3 className="text-xl text-white font-mono">
               Do you want to share your picture?
             </h3>
-            <p className="text-sm font-mono text-foreground">
+            <p className="text-sm font-mono text-white">
               If so, click the share icon on the image you want to share.
             </p>
           </div>

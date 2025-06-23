@@ -42,7 +42,7 @@ export const Modal: React.FC<ModalProps> = ({
       aria-labelledby={title ? "modal-title" : undefined} // Accessibility: aria-labelledby
     >
       <div
-        className="bg-[#1F1F1F] rounded-[32px] shadow-xl p-12 w-full max-w-3xl relative text-foreground animate-slide-up-fade-in flex flex-col"
+        className="bg-[#1F1F1F] rounded-[32px] shadow-xl p-12 w-full max-w-3xl relative text-white animate-slide-up-fade-in flex flex-col"
         onClick={handleModalContentClick} // Prevent closing when clicking inside
         role="document" // Accessibility: role for inner container
       >
