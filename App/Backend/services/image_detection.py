@@ -100,7 +100,7 @@ async def detect(req: DetectionRequest) -> DetectionResponse:
                 device=states.DEVICE
             )
             # Detections
-            print("Detections Summary:", detection_summary)
+            print("Single Detection Summary:", detection_summary)
 
             try:
                 for detection in detection_summary:
@@ -117,15 +117,14 @@ async def detect(req: DetectionRequest) -> DetectionResponse:
         encoded_image = base64.b64encode(buffer).decode('utf-8')
         image_base64_with_header = f"data:image/jpeg;base64,{encoded_image}"
 
-
-        print("Raw Requested Set:", states.USER_PROMPT_SUMMARY)
+        # Printing Raw detection summaries
+        print("Raw Detection Summaries:", detection_summaries)
         
-
         # Recall Calculations and handling
         try:
-            eval_detection_summary = ast.literal_eval(detection_summary)
+            eval_detections_summary = ast.literal_eval(detection_summaries)
             user_requested_set = set(item.lower() for item in states.USER_PROMPT_SUMMARY)
-            predicted_set = set(item.lower() for item in eval_detection_summary)
+            predicted_set = set(item.lower() for item in eval_detections_summary)
 
             matches = {
                 user_item for user_item in user_requested_set
