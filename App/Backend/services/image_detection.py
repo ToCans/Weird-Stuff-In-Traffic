@@ -103,9 +103,9 @@ async def detect(req: DetectionRequest) -> DetectionResponse:
             print("Single Detection Summary:", detection_summary)
 
             try:
-                for detection in detection_summary:
+                for detection in ast.literal_eval(detection_summary):
                     if detection not in detection_summaries  and type(detection) is str:
-                        detection_summaries.append(detection)
+                        detection_summaries.append(str(detection))
             except Exception as e:
                 print("Error processing detection summary:", e)
 
