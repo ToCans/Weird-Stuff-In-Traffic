@@ -52,12 +52,19 @@ export default function ChatPage() {
     isShareModalOpen,
     isShareModal2Open,
     sharedImageUrlForModal2,
+    runTour,
     toggleShareModal,
     toggleShareModal2,
+    initializeTutorial,
   } = useUIStore();
 
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const modalTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Initialize tutorial on component mount
+  useEffect(() => {
+    initializeTutorial();
+  }, [initializeTutorial]);
 
   useEffect(() => {
     if (modalTimeoutRef.current) {
@@ -329,7 +336,8 @@ export default function ChatPage() {
           </motion.div>
         </div>
       </div>
-      <TutorialTour />
+      {/* Only render TutorialTour if runTour is true */}
+      {runTour && <TutorialTour />}
       <Modal
         isOpen={isShareModalOpen}
         onClose={handleCloseShareModal}

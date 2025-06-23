@@ -33,6 +33,7 @@ export interface UIState {
   // other UI states
   showCopiedTooltip: boolean;
   runTour: boolean;
+  hasTutorialBeenShown: boolean;
   activeTab: "scoring" | "tips" | "goal" | "instructions";
 }
 
