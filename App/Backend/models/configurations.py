@@ -22,5 +22,12 @@ detectron_cfg.MODEL.WEIGHTS = path_to_base_directory+"Weird-Stuff-In-Traffic/App
 detectron_cfg.MODEL.DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 detectron_cfg.DATASETS.TEST = ("my_dataset_test", )
 
-detectron_cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.80
+detectron_cfg.MODEL.ANCHOR_GENERATOR.SIZES = [[8, 16, 32, 64, 128, 256, 512, 1024]]
+detectron_cfg.MODEL.ANCHOR_GENERATOR.ASPECT_RATIOS = [[0.25, 0.5, 1.0, 2.0, 4.0]]  
+detectron_cfg.MODEL.RPN.IN_FEATURES = ["p2", "p3", "p4", "p5", "p6"]  
+
+detectron_cfg.MODEL.RPN.PRE_NMS_TOPK_TRAIN = 12000
+detectron_cfg.MODEL.RPN.POST_NMS_TOPK_TRAIN = 2500
+detectron_cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = 96
+detectron_cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.8
 detectron_cfg.MODEL.ROI_HEADS.NUM_CLASSES = 1
