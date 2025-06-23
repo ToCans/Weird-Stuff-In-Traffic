@@ -246,11 +246,22 @@ def create_mask_image(img_w, img_h, x1, y1, x2, y2):
     return mask
 
 
-def realvisxl_inpaint(x1, y1, x2, y2, image, user_prompt, strength):
-    negative_prompt = "blurry, artifacts, distorted, mutated, extra limbs, extra objects, low quality, bad composition, background change, duplicated, cloned"
-    styling_prompt = ", realistically integrated into a real-world Street scene, preserving the original background, lighting, camera angle and perspective"
-    negative_prompt = "blurry, artifacts, distorted, extra limbs, low quality, unrealistic, ugly"
-    styling_prompt = ", street view, scene, photography, detailed, high quality, near the camera"
+def realvisxl_inpaint(image, bbox, user_prompt, strength, g_scale):
+
+    x1, y1, x2, y2 = bbox
+
+    styling_prompt = (
+        ", central position, size proportional to the surrounding, ultra-realistic photo, integration with natural shadows, "
+        "realistic reflections, consistent ambient lighting, matching camera angle and focal depth. "
+        "Preserve street texture and geometric alignment. crisp detail, "
+        "subtle gradients, consistent color tones, background integrety."
+    )
+    negative_prompt = (
+        "big, huge, oversized objects, blurry, low resolution, poor detail, artifacts, double edges, distorted anatomy, extra limbs, "
+        "unrealistic lighting, harsh shadows, incorrect perspective, CGI, animation, "
+        "exaggerated pose, fake texture, logo, watermark, text, grainy, tiling, "
+        "disconnected background, disjointed integration, bad shadow, plastic look, out of place, half generated, missing limbs"
+    )
 
     mask_image = create_mask_image(image.size[0], image.size[1], x1, y1, x2, y2)
 
@@ -270,20 +281,12 @@ def realvisxl_inpaint(x1, y1, x2, y2, image, user_prompt, strength):
         mask_image=mask_image,
         strength=strength,
         num_inference_steps=40,
-        guidance_scale=7.0,
+        guidance_scale=g_scale,
         height=896,
         width=1600,
         inpaint_full_res=True,
         inpaint_full_res_padding=32,
-        generator=torch.Generator("cuda").manual_seed(42)
+        # generator=torch.Generator("cuda").manual_seed(42)
     )
 
     return result.images[0]
-
-def inpaint_image(street_image, bbox, user_prompt, strength=0.6):
-
-    x1, y1, x2, y2 = bbox
-
-    inpainted_image = realvisxl_inpaint(x1, y1, x2, y2, street_image, user_prompt, strength)
-
-    return inpainted_image
