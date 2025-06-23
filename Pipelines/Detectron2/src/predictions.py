@@ -17,37 +17,44 @@ import time
 
 
 test_metadata = MetadataCatalog.get("my_dataset_test")
-test_metadata.thing_classes = ["weird_object"] 
+test_metadata.thing_classes = ["weird_object"]  
 
 # Configuration
 cfg = get_cfg()
 cfg.merge_from_file(model_zoo.get_config_file("COCO-Detection/faster_rcnn_X_101_32x8d_FPN_3x.yaml"))
 cfg.MODEL.DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
-cfg.MODEL.WEIGHTS = "/home/danielshaquille/Daniel/projects/code/weird_stuff_in_traffic_local/output/20250526_ws_best_model.pth"
+cfg.MODEL.WEIGHTS = "/home/danielshaquille/Daniel/projects/code/weird_stuff_in_traffic_local/output/20250621_ws_best_model.pth"
 cfg.DATASETS.TEST = ("my_dataset_test", )
 
+# ===== Enhanced Anchor Configuration =====
+cfg.MODEL.ANCHOR_GENERATOR.SIZES = [[8, 16, 32, 64, 128, 256, 512, 1024]]
+cfg.MODEL.ANCHOR_GENERATOR.ASPECT_RATIOS = [[0.25, 0.5, 1.0, 2.0, 4.0]]  
+cfg.MODEL.RPN.IN_FEATURES = ["p2", "p3", "p4", "p5", "p6"]  
 
-cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.80
+cfg.MODEL.RPN.PRE_NMS_TOPK_TRAIN = 12000
+cfg.MODEL.RPN.POST_NMS_TOPK_TRAIN = 2500
+cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = 96
+cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.8
 cfg.MODEL.ROI_HEADS.NUM_CLASSES = 1
 predictor = DefaultPredictor(cfg)
 
 # Image settings
-TARGET_WIDTH = 640
-TARGET_HEIGHT = 640
+TARGET_WIDTH = 1600
+TARGET_HEIGHT = 800
 OUTPUT_DIR = "/home/danielshaquille/Daniel/projects/code/weird_stuff_in_traffic_local/predictions"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # Get images
-all_images = glob.glob('/home/danielshaquille/Daniel/projects/datasets/weird_stuff_in_traffic/coco_datasets/test/*jpg')
+all_images = glob.glob('/home/danielshaquille/Daniel/projects/datasets/weird_stuff_in_traffic/coco_datasets/test_impainting/*jpg')
 
 # Select random images
 random.seed(20)
-selected_images = random.sample(all_images, min(1, len(all_images)))
+selected_images = random.sample(all_images, min(126, len(all_images)))
 
-# For timing (in milliseconds)
+
 inference_times_ms = []
 
-# First run - warm up only
+# First run
 if len(selected_images) > 0:
     warm_up_image = selected_images[0]
     im = cv2.imread(warm_up_image)
@@ -57,7 +64,7 @@ if len(selected_images) > 0:
     warmup_time = (time.time() - start_time) * 1000
     print(f"Warm-up run completed in {warmup_time:.2f} ms (discarded from averages)\n")
 
-# Process all images (including first one)
+# Process all images
 for i, image_path in enumerate(selected_images):
     # Read and resize image
     im = cv2.imread(image_path)
@@ -68,7 +75,7 @@ for i, image_path in enumerate(selected_images):
     outputs = predictor(resized_im)
     inference_time_ms = (time.time() - start_time) * 1000
     
-    # Store timing (skip first image for metrics)
+    # Store timing 
     if i > 0:
         inference_times_ms.append(inference_time_ms)
     
@@ -91,7 +98,7 @@ for i, image_path in enumerate(selected_images):
     print(f"Inference time: {inference_time_ms:.2f} ms")
     print(f"Saved to: {output_path}\n")
 
-# Performance metrics (excluding warm-up)
+# Performance metrics 
 if inference_times_ms:
     avg_time_ms = sum(inference_times_ms) / len(inference_times_ms)
     min_time_ms = min(inference_times_ms)
