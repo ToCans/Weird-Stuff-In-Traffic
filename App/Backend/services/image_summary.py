@@ -69,14 +69,5 @@ def generate_response(model_inputs, base_model: transformers.Qwen2VLForCondition
 
     return output_texts[0]
 
-def is_partial_match(user_term, predicted_terms):
-    user_tokens = set(user_term.lower().split())
-
-    for pred in predicted_terms:
-        pred_tokens = set(pred.lower().split())
-
-        # Only match if there's a token-level overlap
-        if user_tokens & pred_tokens:
-            return True
-
-    return False
+def is_partial_match(user_item, predicted_set):
+    return any(user_item in pred_item or pred_item in user_item for pred_item in predicted_set)

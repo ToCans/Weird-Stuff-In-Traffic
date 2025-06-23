@@ -125,9 +125,6 @@ async def detect(req: DetectionRequest) -> DetectionResponse:
             user_requested_set = set(item.lower() for item in states.USER_PROMPT_SUMMARY)
             predicted_set = set(item.lower() for item in eval_detection_summary)
 
-            def is_partial_match(user_item, predicted_set):
-                return any(user_item in pred_item or pred_item in user_item for pred_item in predicted_set)
-
             matches = {
                 user_item for user_item in user_requested_set
                 if user_item in predicted_set or is_partial_match(user_item, predicted_set)
