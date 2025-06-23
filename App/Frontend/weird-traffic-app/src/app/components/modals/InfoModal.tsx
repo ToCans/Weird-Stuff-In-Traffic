@@ -108,33 +108,123 @@ export const InfoModal: React.FC<InfoModalProps> = ({ isOpen, onClose }) => {
         {/* Content Area */}
         <div className="mt-4">
           {activeTab === "scoring" && (
-            <div className="h-[400px] w-full overflow-y-auto custom-scrollbar">
+            <div className="h-[410px] w-full overflow-y-auto custom-scrollbar">
               <div className="flex justify-between text-sm text-[white] mb-2 px-2">
                 <span>Recognized</span>
                 <span>Points</span>
               </div>
               <ul className="flex flex-col">
                 {scoringData.map((item, index) => (
-                  <React.Fragment key={index}>
+                  <li key={item.recognized}>
                     {index > 0 && (
-                      <div className="h-px bg-weird-gradient mx-2" />
+                      <div className="h-[2px] bg-weird-gradient mx-2" />
                     )}
-                    <li className="flex justify-between py-2 px-2 text-sm">
+                    <div className="flex justify-between py-2 px-2 text-sm">
                       <span>{item.recognized}</span>
                       <span>{item.points}</span>
-                    </li>
-                  </React.Fragment>
+                    </div>
+                  </li>
                 ))}
               </ul>
             </div>
           )}
           {activeTab === "tips" && (
-            <div className="h-[400px] w-full overflow-y-auto custom-scrollbar p-2 text-sm text-light">
-              <p>Tips for creating creative and unique prompts.</p>
+            <div className="h-[410px] w-full overflow-y-auto custom-scrollbar p-2 space-y-4 text-sm text-light">
+              <div className="rounded-2xl p-[2px] bg-weird-gradient">
+                <div className="bg-[var(--gray)] rounded-2xl p-3">
+                  <div className="font-bold mb-2">Tip</div>
+                  <div>
+                    The more unusual and unexpected your scenario, the higher
+                    your chances of confusing the AI and earning maximum points!
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <div className="font-bold text-base mb-2">
+                    Effective Strategies:
+                  </div>
+                  <ul className="list-disc pl-6 space-y-2">
+                    <li>
+                      <strong>Combine unexpected elements:</strong> "A giraffe
+                      driving a motorcycle in heavy rain"
+                    </li>
+                    <li>
+                      <strong>Add weather chaos:</strong> "Snow tornado with
+                      flying umbrellas blocking traffic"
+                    </li>
+                    <li>
+                      <strong>Mix scales:</strong> "Giant ants carrying tiny
+                      cars across the street"
+                    </li>
+                    <li>
+                      <strong>Time paradoxes:</strong> "Medieval knights riding
+                      horses next to cars"
+                    </li>
+                  </ul>
+                </div>
+
+                <div>
+                  <div className="font-bold text-base mb-2">
+                    What NOT to Include:
+                  </div>
+                  <ul className="list-disc pl-6 space-y-2">
+                    <li>Violence, gore, or harmful content</li>
+                    <li>Inappropriate or offensive material</li>
+                    <li>Personal information or real names</li>
+                    <li>Copyright-protected characters or brands</li>
+                  </ul>
+                </div>
+
+                <div>
+                  <div className="font-bold text-base mb-2">
+                    Prompt Structure Tips:
+                  </div>
+                  <ul className="list-disc pl-6 space-y-2">
+                    <li>
+                      <strong>Start with a base:</strong> "Busy intersection
+                      with..."
+                    </li>
+                    <li>
+                      <strong>Add the weird element:</strong> "...dancing
+                      elephants..."
+                    </li>
+                    <li>
+                      <strong>Include context:</strong> "...during a
+                      thunderstorm at night"
+                    </li>
+                    <li>
+                      <strong>Be specific:</strong> Use colors, sizes, emotions,
+                      and details
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="bg-[var(--gray)] rounded-xl p-3">
+                  <div className="font-bold mb-2">
+                    🏆 Example High-Scoring Prompts:
+                  </div>
+                  <ul className="text-xs space-y-1">
+                    <li>
+                      "Purple kangaroos bouncing between cars while it's raining
+                      jellybeans"
+                    </li>
+                    <li>
+                      "Traffic jam with cars made of ice cream melting in desert
+                      heat"
+                    </li>
+                    <li>
+                      "Intersection where gravity works sideways and cars drive
+                      on walls"
+                    </li>
+                  </ul>
+                </div>
+              </div>
             </div>
           )}
           {activeTab === "goal" && (
-            <div className="h-[400px] w-full overflow-y-auto custom-scrollbar p-2 space-y-4 text-sm text-light">
+            <div className="h-[410px] w-full overflow-y-auto custom-scrollbar p-2 space-y-4 text-sm text-light">
               <p>
                 The goal of Weird Stuff in Traffic is to generate as many
                 creative and unexpected prompts as possible to train a detection
@@ -152,7 +242,7 @@ export const InfoModal: React.FC<InfoModalProps> = ({ isOpen, onClose }) => {
             </div>
           )}
           {activeTab === "instructions" && (
-            <div className="h-[400px] w-full overflow-y-auto custom-scrollbar p-2 space-y-6 text-sm text-light">
+            <div className="h-[410px] w-full overflow-y-auto custom-scrollbar p-2 space-y-6 text-sm text-light">
               <div className="rounded-2xl p-[2px] bg-weird-gradient">
                 <div className="bg-[var(--gray)] rounded-2xl p-3 space-y-1">
                   <div className="font-bold">Goal</div>

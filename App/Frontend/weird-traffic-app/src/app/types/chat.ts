@@ -15,6 +15,12 @@ export interface Message {
   lastDetectionPoints?: number | null;
 }
 
+export interface DetectApiResponse {
+  prompt: string; // The prompt used for detection
+  score: number;
+  imageBase64: string; // Add the detected image base64
+}
+
 // Add any other types specific to the chat feature here in the future
 // Single generated image
 export interface GeneratedImage {

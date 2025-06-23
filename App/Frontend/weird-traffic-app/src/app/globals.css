@@ -9,6 +9,9 @@
   --border: #424242;
   --text-light: #bababa;
 }
+nextjs-portal {
+  display: none;
+}
 
 @theme inline {
   --color-background: var(--background);

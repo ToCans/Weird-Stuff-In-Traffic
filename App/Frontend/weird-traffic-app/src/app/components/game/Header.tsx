@@ -6,30 +6,16 @@ import { usePathname } from "next/navigation";
 import type { ActiveView } from "@/app/types/chat";
 import { IconButton } from "../ui/IconButton";
 import { InfoModal } from "../modals/InfoModal";
-
-// Define props type for Header
-type HeaderProps = {
-  earnedPoints: number;
-  trainingProgress: number;
-  onSwitchView: (view: ActiveView) => void; // Add this line
-};
+import { useGameStore, useUIStore } from "@/app/stores";
 
 // import { InfoModal } from "@/app/conponents/ui/InfoModal";
 
-export function Header({
-  earnedPoints,
-  trainingProgress,
-  onSwitchView,
-}: HeaderProps) {
-  // Destructure props
-  const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
+export function Header() {
+  const { earnedPoints, trainingProgress, handleSwitchView } = useGameStore();
+  const { isInfoModalOpen, toggleInfoModal } = useUIStore();
 
   const pathname = usePathname(); // Get current path
   const isChatPage = pathname === "/chat"; // Check if it's the chat page
-
-  const toggleInfoModal = () => {
-    setIsInfoModalOpen(!isInfoModalOpen);
-  };
 
   // Ensure progress is between 0 and 100 for the progress bar
   const clampedProgress = Math.max(0, Math.min(100, trainingProgress || 0));

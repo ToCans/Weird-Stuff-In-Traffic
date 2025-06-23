@@ -1,3 +1,4 @@
+//DONT USED ANYMORE - USE stores/gameStore.ts INSTEAD
 import { useState, useCallback, useEffect } from "react";
 import type {
   Message,
@@ -68,7 +69,8 @@ export function useChatLogic() {
       setTrainingProgress((prev) => Math.min(100, prev + progressIncrement));
 
       console.log(
-        `Finalized Update: Points (${earnedPoints + pointsToAdd // Use argument directly for logging consistency if needed, though state will update
+        `Finalized Update: Points (${
+          earnedPoints + pointsToAdd // Use argument directly for logging consistency if needed, though state will update
         }), Progress (${Math.min(
           100,
           currentProgress + progressIncrement
@@ -170,7 +172,6 @@ export function useChatLogic() {
       const detectedImage = result.imageBase64; // Extract detectedImage
       const points = calculateUserPoints(score); // Calculate points based on score
 
-
       console.log(
         "Detection API call successful. Score:",
         score,
@@ -190,12 +191,12 @@ export function useChatLogic() {
         prevMessages.map((msg) =>
           msg.id === messageId
             ? {
-              ...msg,
-              isDetecting: false,
-              detectedImageUrl: detectedImage, // Store the detected image URL
-              lastDetectionScore: score, // Store score
-              lastDetectionPoints: points, // Store points
-            }
+                ...msg,
+                isDetecting: false,
+                detectedImageUrl: detectedImage, // Store the detected image URL
+                lastDetectionScore: score, // Store score
+                lastDetectionPoints: points, // Store points
+              }
             : msg
         )
       );
@@ -212,9 +213,7 @@ export function useChatLogic() {
         });
 
         // Now set the dialog sequence which will trigger the animation
-        setDialogSequence(
-          updateDialogMessages.detectionResult(score, points)
-        );
+        setDialogSequence(updateDialogMessages.detectionResult(score, points));
         console.log(
           `Calculated ${points} points. Dialog updated, waiting for animation to finalize state.`
         );
