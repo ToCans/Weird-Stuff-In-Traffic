@@ -27,7 +27,7 @@ async def generate(req: ImageGenerationPrompt) -> GeneratedImages:
         states.USER_PROMPT_SUMMARY = extract_nouns_with_counts(req.prompt)
 
         # Randomly select street image from dataset
-        street_image_folder_path = "/home/ai-team2/Weird-Stuff-In-Traffic/Data/yolo/nuScenes/images/train"
+        street_image_folder_path = "/home/ai-team2/Weird-Stuff-In-Traffic/App/Backend/images/background_images"
         all_street_image_paths = [
             os.path.join(street_image_folder_path, f)
             for f in os.listdir(street_image_folder_path)

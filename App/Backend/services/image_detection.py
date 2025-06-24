@@ -51,7 +51,7 @@ async def detect(req: DetectionRequest) -> DetectionResponse:
             path_to_base_directory = match.group(1) if match else current_directory
 
             filename = f"no_detection_{datetime.datetime.utcnow().strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:8]}.jpeg"
-            save_path = os.path.join(path_to_base_directory, "Weird-Stuff-In-Traffic/App/Backend/failed_images", filename)
+            save_path = os.path.join(path_to_base_directory, "Weird-Stuff-In-Traffic/App/Backend/images/failed_images", filename)
 
             os.makedirs(os.path.dirname(save_path), exist_ok=True)
             cv2.imwrite(save_path, image_bgr)
