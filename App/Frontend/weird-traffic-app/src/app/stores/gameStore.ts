@@ -1,6 +1,6 @@
 // src/stores/gameStore.ts
 import { create } from "zustand";
-import { devtools, persist } from "zustand/middleware";
+import { devtools, persist, createJSONStorage } from "zustand/middleware";
 import type { GameState, CarAnimationState } from "./types";
 import {
   DialogMessages,
@@ -382,6 +382,7 @@ export const useGameStore = create<GameStore>()(
       }),
       {
         name: "weird-traffic-game",
+        storage: createJSONStorage(() => sessionStorage),
         partialize: (state) => ({
           earnedPoints: state.earnedPoints,
           trainingProgress: state.trainingProgress,
