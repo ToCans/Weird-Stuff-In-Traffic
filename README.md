@@ -1,8 +1,10 @@
 # Weird-Stuff-In-Traffic
 
-### Project Summary
+### 🚦 Project Summary
 
-The "Weird Stuff In Traffic" projects presents a gamified, web-based application designed to enhance the training of object detection models for autonomous driving systems. In the game, users are encouraged to create unusual or "weird" traffic scenes through textual prompts. A fine-tuned AI model then attempts to identify unusual objects within the generated images. The core objective is to identify gaps in the model’s recognition capabilities by encouraging users to create scenes that the AI fails to detect correctly.
+Weird Stuff In Traffic is a gamified, web-based app that helps improve object detection models for autonomous driving. Users are prompted to generate bizarre or unexpected traffic scenes using natural language. A fine-tuned AI model then attempts to identify anomalies in these generated images.
+
+The twist? You're trying to break the model — the more unusual the scene, the more likely you'll find its blind spots. This helps surface edge cases where the AI might fail, making it a valuable tool for stress-testing perception systems in self-driving cars.
 
 <p align="center">
   <img src="Documentation/images/explodingcow.png" alt="Exploding Cow" width="400">
