@@ -75,7 +75,7 @@ for i, image_path in enumerate(selected_images):
     outputs = predictor(resized_im)
     inference_time_ms = (time.time() - start_time) * 1000
     
-    # Store timing 
+    # Store timing (skip first image for metrics)
     if i > 0:
         inference_times_ms.append(inference_time_ms)
     
@@ -98,7 +98,7 @@ for i, image_path in enumerate(selected_images):
     print(f"Inference time: {inference_time_ms:.2f} ms")
     print(f"Saved to: {output_path}\n")
 
-# Performance metrics 
+# Performance metrics (excluding warm-up)
 if inference_times_ms:
     avg_time_ms = sum(inference_times_ms) / len(inference_times_ms)
     min_time_ms = min(inference_times_ms)

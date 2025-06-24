@@ -128,10 +128,10 @@ def objective(trial):
     cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = trial.suggest_categorical("roi_batch_size", [64, 96, 128])
     cfg.MODEL.ROI_HEADS.NUM_CLASSES = 1
 
- # ===== Enhanced Anchor Configuration =====
-    cfg.MODEL.ANCHOR_GENERATOR.SIZES = [[8, 16, 32, 64, 128, 256, 512]]  # Full scale coverage
-    cfg.MODEL.ANCHOR_GENERATOR.ASPECT_RATIOS = [[0.25, 0.5, 1.0, 2.0, 4.0]]  # Diverse shapes
-    cfg.MODEL.RPN.IN_FEATURES = ["p2", "p3", "p4", "p5"]  # Re-enabled p5 for large-object support
+    # ===== Enhanced Anchor Configuration =====
+    cfg.MODEL.ANCHOR_GENERATOR.SIZES = [[8, 16, 32, 64, 128, 256, 512, 1024]]
+    cfg.MODEL.ANCHOR_GENERATOR.ASPECT_RATIOS = [[0.25, 0.5, 1.0, 2.0, 4.0]]  
+    cfg.MODEL.RPN.IN_FEATURES = ["p2", "p3", "p4", "p5", "p6"]  
 
     cfg.MODEL.RPN.PRE_NMS_TOPK_TRAIN = trial.suggest_int("rpn_pre_nms_topk_train", 2000, 20000, step=1000)
     cfg.MODEL.RPN.POST_NMS_TOPK_TRAIN = trial.suggest_int("rpn_post_nms_topk_train", 1000, 5000, step=500)
