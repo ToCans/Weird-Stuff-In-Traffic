@@ -15,15 +15,15 @@ The twist? You're trying to break the model — the more unusual the scene, the 
 <p align="center">
   <img src="Documentation/images/Scoring.png" alt="User Frontend" width="600">
 </p>
-<p align="center"><em>Figure 2: User Intefrace.</em></p>
+<p align="center"><em>Figure 2: User Interface.</em></p>
 
 ### 🚀 Getting Started
 #### 📦 Install Dependencies
-1. To install all the necessary python libraries, run the following in your terminal of choice from the project's home directory: `pip install requirements.txt`
+1. To install all the necessary Python libraries, run the following in your terminal of choice from the project's home directory: `pip install requirements.txt`
 2. To then install all necessary node packages, navigate to `Weird-Stuff-In-Traffic/App/Frontend/weird-traffic-app` and run `npm install`
 
 #### 🧠 Running the App
-1. From the home project directory, run the following bash script to simultanously launch the NextJS Frontend and FastAPI backend: `bash start_app.sh`
+1. From the home project directory, run the following bash script to simultaneously launch the NextJS Frontend and FastAPI backend: `bash start_app.sh`
 
 ### 🖥️ Hardware Requirements
 - Nvidia GPU with a minimum of 24GB (Nvidia 4090)
