@@ -20,7 +20,7 @@ The twist? You're trying to break the model — the more unusual the scene, the 
 ### 🚀 Getting Started
 #### 📦 Install Dependencies
 1. To install all the necessary python libraries, run the following in your terminal of choice from the project's home directory: `pip install requirements.txt`
-2. To then install all necessary node packages, navigate to `Weird-Stuff-In-Traffic/App/Frontend` and run `npm install`
+2. To then install all necessary node packages, navigate to `Weird-Stuff-In-Traffic/App/Frontend/weird-traffic-app` and run `npm install`
 
 #### 🧠 Running the App
 1. From the home project directory, run the following bash script to simultanously launch the NextJS Frontend and FastAPI backend: `bash start_app.sh`
