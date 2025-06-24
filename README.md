@@ -15,7 +15,7 @@ The twist? You're trying to break the model — the more unusual the scene, the 
 <p align="center">
   <img src="Documentation/images/Scoring.png" alt="User Frontend" width="600">
 </p>
-<p align="center"><em>Figure 2: User Intefrace".</em></p>
+<p align="center"><em>Figure 2: User Intefrace.</em></p>
 
 ### 🚀 Getting Started
 #### 📦 Install Dependencies
