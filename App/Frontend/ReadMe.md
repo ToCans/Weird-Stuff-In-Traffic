@@ -20,18 +20,6 @@ Follow the steps below to run the project in development mode:
     # or
     bun install
     ```
-3.  Start the development server:
-    ```bash
-    npm run dev
-    # or
-    yarn dev
-    # or
-    pnpm dev
-    # or
-    bun dev
-    ```
-
-Open [http://localhost:3000](http://localhost:3000) in your browser to see the result.
 
 ## Screenshots
 
@@ -48,23 +36,23 @@ _Detection_
 
 ## 📁 Project Structure
 
-- **`weird-traffic-app/`** - The root directory of the Next.js application.
-  - **`public/`**: Contains static assets like images (`car.png`).
-  - **`src/app/`**: The core of the application, following the Next.js App Router structure.
-    - **`api/`**: Houses the backend API routes.
-      - `detect/route.ts`: Forwards detection requests to the main backend.
-      - `generate/route.ts`: Forwards image generation requests to the main backend.
-    - **`chat/`**: Contains the main client-side chat page and its related logic.
-    - **`components/`**: Home to reusable React components used across the app (e.g., UI elements, game components).
-    - **`constants/`**: Stores static data, like dialog messages and words for the games.
-    - **`hooks/`**: Contains custom React hooks for shared logic.
-    - **`stores/`**: Holds [zustand](https://zustand.docs.pmnd.rs/guides/nextjs) global state management stores.
-    - **`types/`**: Defines TypeScript types and interfaces.
-    - **`utils/`**: Includes utility functions, such as scoring logic.
-    - `globals.css`: Defines global styles and Tailwind CSS configurations.
-    - `layout.tsx`: The root layout component for the entire application.
-    - `page.tsx`: The main page component of the app.
-  - **Configuration Files**: Root files like `next.config.ts`, `tailwind.config.ts`, and `tsconfig.json` configure the project's behavior, styling, and TypeScript settings.
+-   **`weird-traffic-app/`** - The root directory of the Next.js application.
+    -   **`public/`**: Contains static assets like images (`car.png`).
+    -   **`src/app/`**: The core of the application, following the Next.js App Router structure.
+        -   **`api/`**: Houses the backend API routes.
+            -   `detect/route.ts`: Forwards detection requests to the main backend.
+            -   `generate/route.ts`: Forwards image generation requests to the main backend.
+        -   **`chat/`**: Contains the main client-side chat page and its related logic.
+        -   **`components/`**: Home to reusable React components used across the app (e.g., UI elements, game components).
+        -   **`constants/`**: Stores static data, like dialog messages and words for the games.
+        -   **`hooks/`**: Contains custom React hooks for shared logic.
+        -   **`stores/`**: Holds [zustand](https://zustand.docs.pmnd.rs/guides/nextjs) global state management stores.
+        -   **`types/`**: Defines TypeScript types and interfaces.
+        -   **`utils/`**: Includes utility functions, such as scoring logic.
+        -   `globals.css`: Defines global styles and Tailwind CSS configurations.
+        -   `layout.tsx`: The root layout component for the entire application.
+        -   `page.tsx`: The main page component of the app.
+    -   **Configuration Files**: Root files like `next.config.ts`, `tailwind.config.ts`, and `tsconfig.json` configure the project's behavior, styling, and TypeScript settings.
 
 ### API Integration and User Interaction Flow
 
@@ -77,18 +65,18 @@ The `/api/generate` route accepted a user-provided textual prompt and returned a
 
 // Request body
 const requestBody = {
-  prompt: "textual prompt provided by the user",
+	prompt: 'textual prompt provided by the user',
 };
 
 // Type for a single generated image
 export interface GeneratedImage {
-  prompt: string;
-  imageBase64: string;
+	prompt: string;
+	imageBase64: string;
 }
 
 // Response containing multiple generated images
 export interface GeneratedImages {
-  images: GeneratedImage[];
+	images: GeneratedImage[];
 }
 ```
 
@@ -99,15 +87,15 @@ After image selection, the `/api/detect` endpoint was called with both the origi
 
 // Request body
 const requestBody = {
-  prompt: "Associated textual prompt",
-  imageBase64: "...", // selectedImage
+	prompt: 'Associated textual prompt',
+	imageBase64: '...', // selectedImage
 };
 
 // Response type
 export interface DetectApiResponse {
-  prompt: string; // The prompt used for detection
-  score: number;
-  imageBase64: string; // detectedImage
+	prompt: string; // The prompt used for detection
+	score: number;
+	imageBase64: string; // detectedImage
 }
 ```
 
@@ -115,8 +103,8 @@ export interface DetectApiResponse {
 
 To learn more about Next.js, take a look at the following resources:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+-   [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+-   [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
