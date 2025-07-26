@@ -35,9 +35,13 @@ YOLO-based object detection pipeline with training, tuning, and visualization su
 - `annotations_visualization.py` — Visualizes annotations on images.
 - `auto_annotations.py` — Assists with semi-automatic annotation of new data.
 - `data.yaml`, `data_tune.yaml` — Dataset configuration files for training and tuning.
-- `inference.py` — Visualizes YOLO model predictions.
+- `inference.py` — Visualizes YOLO model predictions, with options to save the bounding boxes and annotated images.
 - `train.py` — Trains the YOLO model.
-- `tune.py` — Performs hyperparameter tuning for the YOLO model.
+- `tune.py` — Performs hyperparameter tuning for the YOLO model using Optuna.
+- `train_best_trials.py` — Trains the YOLO model with hyperparameters from the best trial(s) in the .db file.
+- `yolo_optuna_11n.db` — Optuna study containing all runs and results
+- `yolo_version_benchmarking.py` — Benchmarks different YOLO versions (e.g. v8s, v11n..) on different subsets of the dataset
+- `agg_benchmark_results.py` — Aggregates the results of all benchmarking runs 
 
 ---
 
