@@ -34,6 +34,7 @@ YOLO-based object detection pipeline with training, tuning, and visualization su
 **Scripts:**
 - `annotations_visualization.py` — Visualizes annotations on images.
 - `auto_annotations.py` — Assists with semi-automatic annotation of new data.
+- `best.pt` — Best performing Yolo11n model.
 - `data.yaml`, `data_tune.yaml` — Dataset configuration files for training and tuning.
 - `inference.py` — Visualizes YOLO model predictions, with options to save the bounding boxes and annotated images.
 - `train.py` — Trains the YOLO model.
