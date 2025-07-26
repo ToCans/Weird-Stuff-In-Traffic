@@ -4,9 +4,9 @@ import optuna
 # EDIT BEFORE START
 dataset_path = "data.yaml" #.yaml file path
 save_dir = "runs"
-epochs = 3
+epochs = 50
 patience = 10
-n_trials = 5
+n_trials = 750
 
 def objective(trial):
 
@@ -95,19 +95,20 @@ def objective(trial):
     # Return the metric to optimize 
     return results.results_dict['metrics/mAP50-95(B)']
 
-# Create study and optimize
-study = optuna.create_study(
-    direction='maximize',    # We want to maximize mAP50-95
-    study_name='yolo_optimization',
-    storage='sqlite:///yolo_optuna.db',
-    load_if_exists=True,  # continue existing study if found in dir 
-)
-study.optimize(objective, n_trials=n_trials)
 
-# Print best results
-print('Best trial:')
-trial = study.best_trial
-print(f'  Value: {trial.value}')
-print('  Params: ')
-for key, value in trial.params.items():
-    print(f'    {key}: {value}')
+def main():
+    # Create study and optimize
+    study = optuna.create_study(
+        direction='maximize',    # We want to maximize mAP50-95
+        study_name='yolo_optimization',
+        storage='sqlite:///yolo_optuna_11n.db',
+        load_if_exists=True,  # continue existing study if found in dir 
+    )
+    study.optimize(objective, n_trials=n_trials)
+
+    # Print best results
+    print('Did your GPU catch fire yet? 🔥 If not, then the study was completed without any issues. 🥳')
+
+if __name__ == "__main__":
+    main()
+
