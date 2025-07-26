@@ -70,7 +70,7 @@ def main():
         elif choice == '2':
             train_resume()
         elif choice == '3':
-            print("Blowing up the server and deleting all the files...")
+            print("Exiting...")
             break
         else:
             print("Invalid choice. Please enter 1, 2, or 3.")
