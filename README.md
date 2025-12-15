@@ -6,6 +6,9 @@ Weird Stuff In Traffic is a gamified, web-based app that helps improve object de
 
 The twist? You're trying to break the model — the more unusual the scene, the more likely you'll find its blind spots. This helps surface edge cases where the AI might fail, making it a valuable tool for stress-testing perception systems in self-driving cars.
 
+### ▶️ Presentation Video
+[Click to watch](https://drive.google.com/file/d/1Oh41i4pZeZzXdE1nxwHMSHKD3VMvwu0c/view?usp=sharing)
+
 <p align="center">
   <img src="Documentation/images/explodingcow.png" alt="Exploding Cow" width="400">
   <img src="Documentation/images/neonparrots.jpg" alt="Neon Parrots" width="400">
